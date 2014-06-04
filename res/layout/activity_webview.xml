@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical" >
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/WebView_Controller"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/background_tabs"
+        android:gravity="center"
+        android:visibility="gone" >
+
+        <ImageButton
+            android:id="@+id/WebView_Controller_Back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/contentDescription_Back"
+            android:src="@drawable/ic_action_goleft" >
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/WebView_Controller_Next"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/contentDescription_Next"
+            android:src="@drawable/ic_action_goright" >
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/WebView_Controller_Reload"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/contentDescription_Reload"
+            android:src="@drawable/ic_action_reload" >
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/WebView_Controller_Stop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/contentDescription_Cancel"
+            android:src="@drawable/ic_action_cancel" >
+        </ImageButton>
+    </LinearLayout>
+
+</LinearLayout>

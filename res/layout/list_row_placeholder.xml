@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_row_placeholder_cell"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="44dp"
+    android:orientation="vertical" >
+
+    <TwoLineListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:mode="twoLine"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingRight"
+        android:paddingStart="?android:attr/listPreferredItemPaddingLeft" >
+
+        <TextView
+            android:id="@android:id/text1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:textAppearance="?android:attr/textAppearanceListItem" />
+
+        <TextView
+            android:id="@android:id/text2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@android:id/text1"
+            android:layout_below="@android:id/text1"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </TwoLineListItem>
+
+    <!-- this is the expandable view that is initially hidden and will slide out when the more button is pressed -->
+
+    <LinearLayout
+        android:id="@+id/list_row_placeholder_expandable"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp" >
+
+        <!-- put whatever you want in the expandable view -->
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/list_row_placeholder_expandable_button_a"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/list_row_placeholder_button_height"
+                android:layout_centerInParent="true"
+                android:drawablePadding="-15sp"
+                android:drawableTop="@drawable/ic_users"
+                android:shadowColor="#666666"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="他の参加者"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" >
+
+            <ImageButton
+                android:id="@+id/list_row_placeholder_expandable_button_b"
+                android:layout_width="@dimen/list_row_placeholder_button_height"
+                android:layout_height="@dimen/list_row_placeholder_button_height"
+                android:layout_centerInParent="true"
+                android:background="@drawable/button_favorite" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/list_row_placeholder_expandable_button_c"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/list_row_placeholder_button_height"
+                android:layout_centerInParent="true"
+                android:shadowColor="#666666"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="詳細を見る"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

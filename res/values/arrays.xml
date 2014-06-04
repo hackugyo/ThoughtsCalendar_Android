@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- アカウント -->
+    <string-array name="list_calendar_owners">
+        <item>philosophy.calendar.jp@gmail.com</item>
+        <item>ktju3jonf98solrasjg5tqucbk@group.calendar.google.com</item>
+        <item>l46snlsirnmc76041keihihmsg@group.calendar.google.com</item>
+    </string-array>
+    <!-- カレンダー名 -->
+    <string-array name="list_calendar_names">
+        <item>哲学・美学イベントカレンダー</item>
+        <item>研究会/講演会情報（主に人文系）</item>
+        <item>哲学・思想系学会・研究会暦</item>
+    </string-array>
+
+</resources>
