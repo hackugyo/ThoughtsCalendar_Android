@@ -13,11 +13,11 @@ import android.provider.CalendarContract.Instances;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 
-public class PlaceholderFragmentHelper {
+public class PlaceHolderFragmentHelper {
 
     public static final ArrayList<String> sCalendarOwners = CustomApplication.getStringArrayById(R.array.list_calendar_owners);
 
-    private PlaceholderFragmentHelper() {
+    private PlaceHolderFragmentHelper() {
 
     }
 
