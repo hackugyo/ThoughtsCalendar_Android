@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_row_placeholder_cell"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_event_cell"
+    android:minHeight="44dp"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp" >
+
+        <ImageView
+            android:id="@+id/list_header_placeholder_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_action_calendar_day" >
+        </ImageView>
+
+        <TextView
+            android:id="@android:id/text1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_toRightOf="@+id/list_header_placeholder_icon"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingStart="?android:attr/listPreferredItemPaddingLeft"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textColor="@color/list_row_placeholder_header_text" />
+    </RelativeLayout>
+
+    <!-- this is the expandable view that is initially hidden and will slide out when the more button is pressed -->
+
+    <FrameLayout
+        android:id="@+id/list_row_placeholder_expandable"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal" >
+    </FrameLayout>
+
+</LinearLayout>

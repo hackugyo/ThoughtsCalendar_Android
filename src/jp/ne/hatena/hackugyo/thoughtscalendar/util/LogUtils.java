@@ -142,6 +142,47 @@ public final class LogUtils {
     }
 
     /**
+     * ログ出力した箇所のメソッド情報に加え，そのメソッドを呼び出したメソッドの情報も表示します．
+     * 
+     * @param logLevel
+     * @param maxSteps
+     * @param msg
+     */
+    public static void withCaller(int logLevel, int maxSteps, CharSequence msg) {
+        if (!AppUtils.isDebuggable()) return;
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+        if (stackTrace.length <= 3 || stackTrace == null) return;
+        String message = getLogForm(stackTrace[3]) + msg;
+        maxSteps = Math.min(3 + maxSteps, stackTrace.length - 1);
+        for (int step = 4; step <= maxSteps; step++) {
+            message = StringUtils.build(//
+                    message, StringUtils.getCRLF(),//
+                    "at ", getLogForm(stackTrace[step])//
+                    );
+        }
+        switch (logLevel) {
+            case Log.VERBOSE:
+                Log.v(Defines.LOG_TAG, message);
+                break;
+            case Log.DEBUG:
+                Log.d(Defines.LOG_TAG, message);
+                break;
+            case Log.INFO:
+                Log.i(Defines.LOG_TAG, message);
+                break;
+            case Log.WARN:
+                Log.w(Defines.LOG_TAG, message);
+                break;
+            case Log.ERROR:
+                Log.e(Defines.LOG_TAG, message);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * ログのヘッダ情報を整形します.
      * 
      * @param elements
@@ -149,11 +190,17 @@ public final class LogUtils {
      * @return ヘッダ情報
      */
     private static String getLogForm(StackTraceElement[] elements) {
+        if (elements.length <= 3 || elements == null) return "";
+        return getLogForm(elements[3]);
+    }
+
+    private static String getLogForm(StackTraceElement element) {
+
         StringBuilder sb = new StringBuilder();
         try {
-            String file = elements[3].getFileName();
-            String method = elements[3].getMethodName();
-            int line = elements[3].getLineNumber();
+            String file = element.getFileName();
+            String method = element.getMethodName();
+            int line = element.getLineNumber();
             sb.append(StringUtils.ellipsizeMiddle(file.replace(".java", ""), 25, true));
             sb.append("#").append(StringUtils.ellipsize(method, 18, true));
             sb.append("() [").append(String.format("%1$04d", line)).append("] : ");

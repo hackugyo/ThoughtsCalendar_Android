@@ -15,9 +15,10 @@ import android.net.Uri;
 
 public class TwitterUtils {
     /**
-     * @param absFragmentActivity
      * @see <a
      *      href="http://andante.in/i/androidアプリtips/twitterのアプリを暗黙的intentで狙いうちの巻/">参考ページ</a>
+     * 
+     * @param context
      * @param text
      * @return 送信成功か否か
      */
@@ -26,7 +27,6 @@ public class TwitterUtils {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, text);
         shareIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        String appName = "twitter";
 
         PackageManager pm = CustomApplication.getAppContext().getPackageManager();
         List<?> activityList = pm.queryIntentActivities(shareIntent, 0);
@@ -57,9 +57,9 @@ public class TwitterUtils {
 
     public static String createHashTag(String string) {
         return string//
-                .replace(" ", "").replace("/", "")//
-                .replace("　", "").replace(":", "")//
-                .replace(",", "").replace("'", "");
+                .replaceAll("^[0-9]*", "")// 先頭に数字は使えない
+                .replaceAll("[!$%^&*+./\" 　:,、 , #：、。#「」『』]", "")//
+                .replace("'", "").replace("-", "");
     }
 
     public static void searchByHashTag(Context context, String hashTag) {

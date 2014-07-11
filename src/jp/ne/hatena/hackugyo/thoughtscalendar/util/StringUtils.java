@@ -1,5 +1,6 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.util;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import android.annotation.SuppressLint;
 
 /**
@@ -125,6 +127,27 @@ public final class StringUtils {
     }
 
     /**
+     * 文字列のリストを区切り文字で結合して返します.
+     * 
+     * @param parts
+     *            文字列のリスト
+     * @param separator
+     *            区切り文字
+     * @return 結合後の文字列
+     */
+    public static String join(String[] parts, String separator) {
+        StringBuilder builder = new StringBuilder();
+        int index = 0;
+        int length = parts.length - 1;
+        for (String str : parts) {
+            builder.append(str);
+            if (index < length) builder.append(separator);
+            index++;
+        }
+        return builder.toString();
+    }
+
+    /**
      * Solrの特殊文字をエスケープして返します.
      * 
      * @param str
@@ -155,7 +178,7 @@ public final class StringUtils {
      * @return 変換後の文字列
      */
     public static String getDateStr(Date date, String format) {
-        final SimpleDateFormat sdf = new SimpleDateFormat(format);
+        final SimpleDateFormat sdf = new SimpleDateFormat(format, CustomApplication.getResource().getConfiguration().locale);
         String term = sdf.format(date);
         return term;
     }
@@ -257,6 +280,10 @@ public final class StringUtils {
         return String.format("%1$" + n + "s", s);
     }
 
+    public static String padZeros(int number, int length) {
+        return String.format("%1$0" + length + "d", number);
+    }
+
     /**
      * 与えられた引数が候補リストに含まれるかどうかを返します．
      * 
@@ -290,7 +317,7 @@ public final class StringUtils {
     }
 
     /**
-     * 与えられた文字列が，としてふさわしいかどうか判定します．
+     * 与えられた文字列が，数値としてふさわしいかどうか判定します．
      * 
      * @return 桁数・最小・最大の制約を満たしたときtrue
      */
@@ -360,5 +387,30 @@ public final class StringUtils {
         } else {
             return targ.equals(comp);
         }
+    }
+
+    /**
+     * 金額を3桁区切りにして表示します．
+     * 
+     * @param amount
+     * @return 3桁区切りの文字列
+     */
+    public static String toMoneyString(Integer amount) {
+        if (amount == null) return "";
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        return formatter.format(amount);
+    }
+
+    public static String toMoneyString(String amount) {
+        return toMoneyString(Integer.valueOf(amount));
+    }
+
+    public static boolean areNotEmpty(String... strings) {
+        if (strings == null) return false;
+        for (String obj : strings) {
+            if (obj == null) return false;
+            if (obj.length() == 0) return false;
+        }
+        return true;
     }
 }

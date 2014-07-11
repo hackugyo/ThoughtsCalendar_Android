@@ -3,32 +3,105 @@
     android:id="@+id/list_row_placeholder_cell"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="44dp"
+    android:minHeight="128dp"
     android:orientation="vertical" >
 
-    <TwoLineListItem
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:mode="twoLine"
-        android:paddingEnd="?android:attr/listPreferredItemPaddingRight"
-        android:paddingStart="?android:attr/listPreferredItemPaddingLeft" >
+        android:layout_height="128dp" >
 
-        <TextView
-            android:id="@android:id/text1"
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/list_row_network_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" >
+        </com.android.volley.toolbox.NetworkImageView>
+
+        <View
+            android:id="@+id/list_row_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/image_mask" >
+        </View>
+
+        <View
+            android:id="@+id/list_row_placeholder_flag"
+            android:layout_width="@dimen/activity_horizontal_margin"
+            android:layout_height="match_parent"
+            android:background="@color/attended_cell" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dip"
-            android:textAppearance="?android:attr/textAppearanceListItem" />
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="4dp"
+            android:layout_toLeftOf="@+id/list_row_placeholder_detail"
+            android:layout_toRightOf="@+id/list_row_placeholder_flag"
+            android:paddingEnd="?android:attr/listPreferredItemPaddingRight"
+            android:paddingStart="?android:attr/listPreferredItemPaddingLeft" >
 
-        <TextView
-            android:id="@android:id/text2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@android:id/text1"
-            android:layout_below="@android:id/text1"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </TwoLineListItem>
+            <TextView
+                android:id="@android:id/text1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dip"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="?android:attr/listPreferredItemPaddingLeft"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@color/list_row_placeholder_text" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@android:id/text1"
+                android:layout_below="@android:id/text1"
+                android:gravity="center_vertical"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="?android:attr/listPreferredItemPaddingLeft" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_action_clock" />
+
+                <TextView
+                    android:id="@+id/list_row_placeholder_datetime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="8dp"
+                    android:singleLine="true"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/list_row_placeholder_text" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_action_location" />
+
+                <TextView
+                    android:id="@android:id/text2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/list_row_placeholder_text" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/list_row_placeholder_detail"
+            android:layout_alignParentRight="true"
+            android:layout_width="32dp"
+            android:paddingLeft="16dp"
+            android:src="@drawable/ic_show_detail"
+            android:scaleType="centerInside"
+            android:layout_marginRight="4dp"
+            android:layout_height="128dp" />
+    </RelativeLayout>
 
     <!-- this is the expandable view that is initially hidden and will slide out when the more button is pressed -->
 
@@ -36,60 +109,78 @@
         android:id="@+id/list_row_placeholder_expandable"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="horizontal"
-        android:paddingBottom="4dp" >
+        android:background="@drawable/background_event_cell"
+        android:orientation="horizontal" >
+
+        <View
+            android:id="@+id/list_row_placeholder_flag_expandable"
+            android:layout_width="@dimen/activity_horizontal_margin"
+            android:layout_height="@dimen/list_row_placeholder_button_height"
+            android:background="@color/attended_cell" />
 
         <!-- put whatever you want in the expandable view -->
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/list_row_placeholder_expandable_button_a"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/list_row_placeholder_button_height"
-                android:layout_centerInParent="true"
-                android:drawablePadding="-15sp"
-                android:drawableTop="@drawable/ic_users"
-                android:shadowColor="#666666"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:text="他の参加者"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:paddingBottom="4dp" >
 
             <ImageButton
                 android:id="@+id/list_row_placeholder_expandable_button_b"
                 android:layout_width="@dimen/list_row_placeholder_button_height"
                 android:layout_height="@dimen/list_row_placeholder_button_height"
                 android:layout_centerInParent="true"
-                android:background="@drawable/button_favorite" />
+                android:background="@drawable/button_background_default"
+                android:src="@drawable/ic_unfavorite" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:paddingBottom="4dp" >
 
-            <Button
-                android:id="@+id/list_row_placeholder_expandable_button_c"
-                android:layout_width="wrap_content"
+            <ImageButton
+                android:id="@+id/list_row_placeholder_expandable_button_a"
+                android:layout_width="@dimen/list_row_placeholder_button_height"
                 android:layout_height="@dimen/list_row_placeholder_button_height"
                 android:layout_centerInParent="true"
-                android:shadowColor="#666666"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:text="詳細を見る"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:background="@drawable/button_background_default"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_users" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:paddingBottom="4dp" >
+
+            <ImageButton
+                android:id="@+id/list_row_placeholder_expandable_button_c"
+                android:layout_width="@dimen/list_row_placeholder_button_height"
+                android:layout_height="@dimen/list_row_placeholder_button_height"
+                android:layout_centerInParent="true"
+                android:background="@drawable/button_background_default"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_tag" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:paddingBottom="4dp" >
+
+            <ImageButton
+                android:id="@+id/list_row_placeholder_expandable_button_d"
+                android:layout_width="@dimen/list_row_placeholder_button_height"
+                android:layout_height="@dimen/list_row_placeholder_button_height"
+                android:layout_centerInParent="true"
+                android:background="@drawable/button_background_default"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_monologue" />
         </RelativeLayout>
     </LinearLayout>
 

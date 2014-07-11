@@ -180,4 +180,36 @@ public class ViewUtils {
         Bitmap bitmap = bd.getBitmap();
         if (bitmap != null) bitmap.recycle();
     }
+
+    public static void setActivated(View view, boolean activated) {
+        view.setActivated(activated);
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                setActivated(((ViewGroup) view).getChildAt(i), activated);
+            }
+        }
+    }
+
+    /**
+     * Call this view's and this view's child's OnClickListener, <br>
+     * if it is defined. <br>
+     * Performs all normal actions associated with clicking: <br>
+     * reporting accessibility event, playing a sound, etc.
+     * 
+     * @param view
+     * @return True there was an assigned OnClickListener that was called, false
+     *         otherwise is returned.
+     */
+    public static boolean performClick(View view) {
+        if (view == null) return false;
+        boolean result = view.performClick();
+        if (!result && (view instanceof ViewGroup)) {
+            int count = ((ViewGroup) view).getChildCount();
+            for (int i = 0; i < count; i++) {
+                result = ((ViewGroup) view).getChildAt(i).performClick();
+                if (result) break;
+            }
+        }
+        return result;
+    }
 }

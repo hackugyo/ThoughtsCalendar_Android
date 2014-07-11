@@ -5,6 +5,7 @@ import java.util.Calendar;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendStatus;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.AbsFragment;
+import jp.ne.hatena.hackugyo.thoughtscalendar.ui.adapter.PlaceholderListAdapter;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.StringUtils;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.TwitterUtils;
@@ -14,9 +15,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.util.SparseArrayCompat;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
 import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +22,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +36,7 @@ import com.tjerkw.slideexpandable.library.ActionSlideExpandableListView.OnAction
  * @see <a
  *      href="http://smartphone-zine.com/mobile/google-calendar-app-sourc.html">参考ページ</a>
  */
-public class PlaceholderFragment extends AbsFragment implements LoaderManager.LoaderCallbacks, ViewBinder {
+public class PlaceholderFragment extends AbsFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG_DIALOG_FRAGMENT_SHOW_DETAIL = "TAG_DIALOG_FRAGMENT_SHOW_DETAIL";
     /**
      * The fragment argument representing the section number for this fragment.
@@ -58,10 +55,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
     }
 
     ListView mListView;
-    private SimpleCursorAdapter mAdapter;
-    private SparseArrayCompat<String> mLocations = new SparseArrayCompat<String>();
-    private SparseArrayCompat<String> mDetails = new SparseArrayCompat<String>();
-    private SparseArrayCompat<String> mEventIds = new SparseArrayCompat<String>();
+    private PlaceholderListAdapter mAdapter;
     private ActionSlideExpandableListAdapter mWrappedAdapter;
     private TextView mEmptyView;
 
@@ -82,11 +76,10 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View onCreateView = inflater.inflate(R.layout.fragment_placeholder, container, false);
 
-        String[] from = PlaceholderFragmentHelper.getBindFrom();
+        final int rowForDateTime = 2;
+        mAdapter = new PlaceholderListAdapter(getActivitySafely(), null, false, //
+                R.layout.list_header_placeholder, rowForDateTime);
 
-        int[] to = new int[] { android.R.id.text1, android.R.id.text2, android.R.id.text1, android.R.id.text2, R.id.list_row_placeholder_expandable_button_b };
-        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_row_placeholder, null, from, to, 0);
-        mAdapter.setViewBinder(this);
         mWrappedAdapter = new ActionSlideExpandableListAdapter(//
                 mAdapter,//
                 R.id.list_row_placeholder_cell, //
@@ -98,6 +91,43 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
         return onCreateView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // Loaderの廃棄
+        getLoaderManager().destroyLoader(0);
+    }
+
+    /***********************************************
+     * Loader *
+     **********************************************/
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Calendar calendar = CalendarUtils.getInstance(true);
+        int begin = Time.getJulianDay(calendar.getTimeInMillis(), 0);
+        calendar.add(Calendar.YEAR, 1);
+        int end = Time.getJulianDay(calendar.getTimeInMillis(), 0);
+
+        return PlaceholderFragmentHelper.getCursorLoader(this, begin, end);
+
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
+
+    /***********************************************
+     * View *
+     **********************************************/
     private void setupListView(View parentView) {
         mListView = (ListView) parentView.findViewById(android.R.id.list);
         mListView.setAdapter(mWrappedAdapter);
@@ -114,8 +144,8 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
         mWrappedAdapter.setItemActionListener(getExpandActionListener(), //
                 R.id.list_row_placeholder_expandable_button_a, //
                 R.id.list_row_placeholder_expandable_button_b,//
-                R.id.list_row_placeholder_expandable_button_c//
-                );
+                R.id.list_row_placeholder_expandable_button_c,//
+                R.id.list_row_placeholder_expandable_button_d);
         mWrappedAdapter.setItemExpandCollapseListener(getOnItemExpandCollapseListener());
         mWrappedAdapter.setAnimationDuration(100);
     }
@@ -138,58 +168,6 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
         });
     }
 
-    @Override
-    public Loader onCreateLoader(int id, Bundle args) {
-        Calendar calendar = CalendarUtils.getInstance(true);
-        int begin = Time.getJulianDay(calendar.getTimeInMillis(), 0);
-        calendar.add(Calendar.YEAR, 1);
-        int end = Time.getJulianDay(calendar.getTimeInMillis(), 0);
-
-        return PlaceholderFragmentHelper.getCursorLoader(this, begin, end);
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader loader, Object data) {
-        mAdapter.swapCursor((Cursor) data);
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader loader) {
-        mAdapter.swapCursor(null);
-    }
-
-    @Override
-    public boolean setViewValue(View view, Cursor cursor, int index) {
-
-        final String text = cursor.getString(index);
-        int where = cursor.getPosition();
-        switch (index) {
-            case 1: // event_id
-                mEventIds.append(where, text);
-                ((ImageView) view).setActivated(AttendStatus.getAttendStatus(text));
-                return true;
-            case 4: // title
-                ((TextView) view).setText(text);
-                return true;
-            case 2: // begin
-                Time time = new Time();
-                time.set(Long.parseLong(text));
-                ((TextView) view).setText(CalendarUtils.getDateTimeString(CalendarUtils.getInstance(time.toMillis(false))));
-                return true;
-            case 5: // eventLocation
-                mLocations.append(where, text);
-                return true; // trueを返さないと自動設定されてしまう
-            case 6: // description
-                mDetails.append(where, text);
-                return true;
-            default:
-                break;
-        }
-        return false;
-    }
-
     /***********************************************
      * OnClick Listeners *
      ***********************************************/
@@ -199,21 +177,33 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
 
             @Override
             public void onClick(View itemView, View clickedView, int position) {
-                String location = mLocations.get(position);
-                String detail = mDetails.get(position);
-                CharSequence title = ((TextView) itemView.findViewById(android.R.id.text1)).getText();
-                CharSequence when = ((TextView) itemView.findViewById(android.R.id.text2)).getText();
-                when = when.subSequence(0, 10);
-                boolean isUrl = UrlUtils.isValidUrl(detail);
-                int clickedViewId = clickedView.getId();
-                String hashTag = TwitterUtils.createHashTag(StringUtils.build(title, "_", when));
+                if (mAdapter.getItemViewType(position) == PlaceholderListAdapter.TYPE_HEADER) {
+                    return;
+                }
+                final Cursor cursor = mAdapter.getCursor();
+                cursor.moveToPosition(mAdapter.getCursorPosition(position));
+
+                // _id,event_id,begin,end,title,eventLocation,description,ownerAccount
+
+                final String eventId = cursor.getString(1);
+                final CharSequence title = cursor.getString(4);
+                final String location = cursor.getString(5);
+                final String detail = cursor.getString(6);
+
+                final String whenMillis = cursor.getString(2);
+                Time time = new Time();
+                time.set(Long.parseLong(whenMillis));
+                CharSequence when = CalendarUtils.getDateString(CalendarUtils.getInstance(time.toMillis(false)));
+                when = when.subSequence(0, Math.min(when.length(), 10));
+
+                final boolean isUrl = UrlUtils.isValidUrl(detail);
+                final int clickedViewId = clickedView.getId();
+                String hashTag = PlaceholderFragmentHelper.createHashTag(title, when);
                 switch (clickedViewId) {
                     case R.id.list_row_placeholder_expandable_button_a:
                         TwitterUtils.searchByHashTag(getActivitySafely(), hashTag);
                         break;
-
                     case R.id.list_row_placeholder_expandable_button_b:
-                        String eventId = mEventIds.get(position);
                         boolean willAttendCurrently = AttendStatus.getAttendStatus(eventId);
                         if (!willAttendCurrently) {
                             showSingleToast("Twitterで参加表明しましょう！", Toast.LENGTH_SHORT);
@@ -223,10 +213,15 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                                     );
                         }
                         AttendStatus.setAttendStatus(eventId, !willAttendCurrently);
-                        clickedView.setActivated(!willAttendCurrently);
+                        mAdapter.notifyDataSetChanged();
                         break;
                     case R.id.list_row_placeholder_expandable_button_c:
                         if (isUrl) launchExternalBrowser(detail);
+                        break;
+                    case R.id.list_row_placeholder_expandable_button_d:
+                        TwitterUtils.sendText(getActivitySafely(),//
+                                StringUtils.build(" #", hashTag)//
+                                );
                         break;
                     default:
                         break;
@@ -241,7 +236,12 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
 
             @Override
             public void onExpand(View itemView, int position) {
-                String location = mLocations.get(position);
+                if (mAdapter.getItemViewType(position) == PlaceholderListAdapter.TYPE_HEADER) {
+                    return;
+                }
+                final Cursor cursor = mAdapter.getCursor();
+                cursor.moveToPosition(mAdapter.getCursorPosition(position));
+                final String location = cursor.getString(5);
                 String alertMessage = StringUtils.build(//
                         "このイベントは、", //
                         (StringUtils.isEmpty(location) ? "開催場所不明です。" : location),//

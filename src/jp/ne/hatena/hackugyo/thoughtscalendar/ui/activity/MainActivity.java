@@ -7,8 +7,12 @@ import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.AbsFragmentActivity;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.fragment.PlaceholderFragment;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.fragment.dialogfragment.AbsCustomAlertDialogFragment.Callbacks;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.StringUtils;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -88,6 +92,13 @@ public class MainActivity extends AbsFragmentActivity implements ActionBar.TabLi
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_calendar) {
+
+            Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
+            builder.appendPath("time");
+            builder.appendPath(Long.toString(CalendarUtils.getInstance(true).getTimeInMillis()));
+            Intent intent = new Intent(Intent.ACTION_VIEW, builder.build());
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -127,7 +138,7 @@ public class MainActivity extends AbsFragmentActivity implements ActionBar.TabLi
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override

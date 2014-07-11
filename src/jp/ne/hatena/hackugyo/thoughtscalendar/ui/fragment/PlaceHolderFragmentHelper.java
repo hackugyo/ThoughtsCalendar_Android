@@ -4,20 +4,23 @@ import java.util.ArrayList;
 
 import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.StringUtils;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.TwitterUtils;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.BaseColumns;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Instances;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 
-public class PlaceHolderFragmentHelper {
+public class PlaceholderFragmentHelper {
 
     public static final ArrayList<String> sCalendarOwners = CustomApplication.getStringArrayById(R.array.list_calendar_owners);
 
-    private PlaceHolderFragmentHelper() {
+    private PlaceholderFragmentHelper() {
 
     }
 
@@ -64,5 +67,25 @@ public class PlaceHolderFragmentHelper {
             from = new String[] { "title", "begin", "eventLocation", "description", "event_id" };
         }
         return from;
+    }
+
+    public static final class Place implements BaseColumns {
+
+        // Place Table Columns names
+        public static final String KEY_TITLE = getBindFrom()[0];
+        public static final String KEY_BEGIN = getBindFrom()[1];
+        public static final String KEY_EVENTLOCATION = getBindFrom()[2];
+        public static final String KEY_DESCRIPTION = getBindFrom()[3];
+        public static final String KEY_EVENTID = getBindFrom()[4];
+
+    }
+
+    public static String createHashTag(CharSequence title, CharSequence whenYYYYMMDD) {
+        String title2 = TwitterUtils.createHashTag(title.toString());
+        return TwitterUtils.createHashTag(StringUtils.build(//
+                title2.subSequence(0, Math.min(11, title2.length())), //
+                "_", whenYYYYMMDD.subSequence(2, 8)// YYMMDD
+                )// 全体の長さが 1 + shebang + 11 + 1 + 6 = 20文字に収まるようにした
+                );
     }
 }

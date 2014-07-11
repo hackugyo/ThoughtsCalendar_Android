@@ -1,10 +1,16 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.util;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import android.content.Context;
 import android.content.res.AssetManager;
 
@@ -37,5 +43,39 @@ public class AssetsUtils {
         if (br != null) br.close();
 
         return sb.toString();
+    }
+
+    public static void copyDataFromAssetToPath(String assetName, File path) throws IOException {
+
+        // asset 内のデータベースファイルにアクセス  
+        InputStream mInput;
+        try {
+            mInput = CustomApplication.getAppContext().getAssets().open(assetName);
+        } catch (IOException e) {
+            LogUtils.e("assetsに接続できない．", e);
+            throw e;
+        }
+
+        // デフォルトのデータベースパスに作成した空のDB
+        OutputStream mOutput;
+        try {
+            path.getParentFile().mkdirs();
+            mOutput = new FileOutputStream(path);
+        } catch (FileNotFoundException e) {
+            LogUtils.e("ファイルを開けない．", e);
+            throw e;
+        }
+
+        // コピー  
+        byte[] buffer = new byte[1024];
+        int size;
+        while ((size = mInput.read(buffer)) > 0) {
+            mOutput.write(buffer, 0, size);
+        }
+
+        // Close the streams  
+        mOutput.flush();
+        mOutput.close();
+        mInput.close();
     }
 }

@@ -2,4 +2,13 @@
 <resources>
     
     <color name="background_tabs">#f9f9f9</color>
+    <color name="attended_cell">#66ec7c68</color>
+    
+    <color name="image_mask">#88000000</color>
+    <color name="list_row_placeholder_header_text">#000000</color>
+    <color name="list_row_placeholder_text">#ffffffff</color>
+    
+    <color name="button_background_default">#00000000</color>
+    <color name="button_background_pressed">#fffd9894</color>
+    <color name="button_background_focused">#fffd9894</color>
 </resources>

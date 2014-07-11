@@ -7,7 +7,12 @@ import java.util.TimeZone;
 import junit.framework.Assert;
 import android.annotation.SuppressLint;
 
+import com.google.common.base.Objects;
+
+@SuppressLint("DefaultLocale")
 public final class CalendarUtils {
+
+    private static final String[] DAYS_OF_WEEK = { "日", "月", "火", "水", "木", "金", "土" };
 
     /**
      * Calendarのインスタンスを返します．<br>
@@ -23,6 +28,9 @@ public final class CalendarUtils {
         return result;
     }
 
+    /**
+     * その日の00:00:00のインスタンスを返します．
+     */
     public static Calendar getDateInstance() {
         Calendar result = getInstance(true);
 
@@ -126,6 +134,16 @@ public final class CalendarUtils {
         return dateStringBuilder.toString();
     }
 
+    public static String getTimeString(Calendar calendar) {
+        if (calendar == null) return "";
+        String hourString = String.format("%1$02d", calendar.get(Calendar.HOUR_OF_DAY));
+        String minuteString = String.format("%1$02d", calendar.get(Calendar.MINUTE));
+        StringBuilder dateStringBuilder = new StringBuilder();
+        dateStringBuilder.append(hourString).append(":");
+        dateStringBuilder.append(minuteString);
+        return dateStringBuilder.toString();
+    }
+
     public static String getDateTimeSecondString(Calendar calendar) {
         if (calendar == null) return "";
         // Date と SimpleDateFormat を使うと簡潔に書けるが，DateクラスはJavaにおいてdeprecatedなので使用しない．
@@ -173,6 +191,59 @@ public final class CalendarUtils {
     }
 
     /**
+     * 日付をMMdd(ddd)の文字列にして返します．
+     * 
+     * @param calendar
+     * @param spacer
+     *            （MM, ddの間に入れる）
+     * @return MMdd（ddd）
+     */
+    public static String getDateStringWithoutYear(Calendar calendar, String spacer) {
+        if ((calendar == null)) return "";
+        // Date と SimpleDateFormat を使うと簡潔に書けるが，DateクラスはJavaにおいてdeprecatedなので使用しない．
+        String monthString = String.format("%1$02d", (calendar.get(Calendar.MONTH) + 1));
+        String dateString = String.format("%1$02d", calendar.get(Calendar.DATE));
+        String dayOfWeekString = DAYS_OF_WEEK[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+        StringBuilder dateStringBuilder = new StringBuilder();
+        return dateStringBuilder.append(monthString).append(spacer).append(dateString).append("(").append(dayOfWeekString).append(")").toString();
+    }
+
+    /**
+     * 日付をMMdd(ddd)の文字列にして返します．
+     * 
+     * @param calendar
+     * @param spacer
+     *            （yyyy,MM, ddの間に入れる）
+     * @return yyyyMMdd（ddd）
+     */
+    public static String getYearMonthDateString(Calendar calendar, String spacer) {
+        if ((calendar == null)) return "";
+        // Date と SimpleDateFormat を使うと簡潔に書けるが，DateクラスはJavaにおいてdeprecatedなので使用しない．
+        String monthString = String.format("%1$02d", (calendar.get(Calendar.MONTH) + 1));
+        String dateString = String.format("%1$02d", calendar.get(Calendar.DATE));
+        String dayOfWeekString = DAYS_OF_WEEK[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+        StringBuilder dateStringBuilder = new StringBuilder();
+        return dateStringBuilder.append(calendar.get(Calendar.YEAR)).append(spacer).append(monthString).append(spacer).append(dateString).append("(").append(dayOfWeekString).append(")").toString();
+    }
+
+    /**
+     * 日付をMMddの文字列にして返します．
+     * 
+     * @param calendar
+     * @param spacer
+     *            （MM, ddの間に入れる）
+     * @return MMdd
+     */
+    public static String getMonthDateString(Calendar calendar, String spacer) {
+        if ((calendar == null)) return "";
+        // Date と SimpleDateFormat を使うと簡潔に書けるが，DateクラスはJavaにおいてdeprecatedなので使用しない．
+        String monthString = String.format("%1$02d", (calendar.get(Calendar.MONTH) + 1));
+        String dateString = String.format("%1$02d", calendar.get(Calendar.DATE));
+        StringBuilder dateStringBuilder = new StringBuilder();
+        return dateStringBuilder.append(monthString).append(spacer).append(dateString).toString();
+    }
+
+    /**
      * 日付をddの文字列にして返します．
      * 
      * @param calendar
@@ -215,7 +286,7 @@ public final class CalendarUtils {
         c.set(Calendar.MINUTE, Integer.valueOf(hhmm.substring(2, 4)));
         String hourString = String.format("%1$02d", c.get(Calendar.HOUR_OF_DAY));
         String minuteString = String.format("%1$02d", c.get(Calendar.MINUTE));
-        return StringUtils.isSame(hhmm, hourString + minuteString);
+        return Objects.equal(hhmm, hourString + minuteString);
     }
 
     public static boolean checkValidityOfDate(String yyyyMMdd) {
@@ -295,6 +366,7 @@ public final class CalendarUtils {
             String dd = dateStringBuilder.substring(6, 7 + 1);
             calendar.set(Integer.valueOf(yyyy), Integer.valueOf(MM) - 1, Integer.valueOf(dd));
         } catch (StringIndexOutOfBoundsException e) {
+            LogUtils.w("not valid date: " + yyyyMMdd);
             throw new IllegalArgumentException("not valid date: " + yyyyMMdd);
         }
         // if (calendar.get(Calendar.HOUR_OF_DAY) != 0) throw new IllegalArgumentException();
@@ -336,7 +408,7 @@ public final class CalendarUtils {
     public static Calendar getCalendarDayPlus(Calendar origin, int amount) {
         if (origin == null) return null;
         Calendar result = copy(origin);
-        result.add(Calendar.DATE, amount);
+        result.add(Calendar.DAY_OF_MONTH, amount);
         return result;
     }
 
@@ -389,6 +461,21 @@ public final class CalendarUtils {
         }
 
         return result;
+    }
+
+    /**
+     * 与えられた日のはじめ（00:00:00〜23:59:59）を返します
+     * 
+     * @param target
+     * @return 与えられた日のはじめ（00:00:00）とおわり（23:59:59）とを返します
+     */
+    public static Calendar[] getDateStartEnd(Calendar target) {
+        CalendarUtils.copy(target);
+        Integer[] from = { 0, 0, 0 };
+        Integer[] to = { 23, 59, 59 };
+        return getDateTimeFromTo(//
+                CalendarUtils.copy(target), from, //
+                CalendarUtils.copy(target), to);
     }
 
     public static Calendar add(Calendar c, int field, int value) {
@@ -458,5 +545,24 @@ public final class CalendarUtils {
             calendar.clear(field);
         }
         return calendar;
+    }
+
+    public static int compareTo(Date remindAt, Calendar now) {
+        if (remindAt.getTime() == now.getTimeInMillis()) return 0;
+        return remindAt.getTime() - now.getTimeInMillis() < 0 ? -1 : 1;
+    }
+
+    /**
+     * 
+     * @param c1
+     * @param c2
+     * @return 過去にあたるほうを返します．同じ場合c1のインスタンスを返します
+     */
+    public static Calendar min(Calendar c1, Calendar c2) {
+        if (c1.getTimeInMillis() <= c2.getTimeInMillis()) {
+            return c1;
+        } else {
+            return c2;
+        }
     }
 }

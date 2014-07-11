@@ -7,9 +7,10 @@ import android.net.NetworkInfo;
 
 public class ConnectionUtils {
     public static boolean isConnected() {
-
-        CustomApplication.getAppContext().enforceCallingOrSelfPermission(//
-                android.Manifest.permission.ACCESS_NETWORK_STATE, "need permission: ACCESS_NETWORK_STATE");
+        if (AppUtils.isDebuggable()) {
+            CustomApplication.getAppContext().enforceCallingOrSelfPermission(//
+                    android.Manifest.permission.ACCESS_NETWORK_STATE, "need permission: ACCESS_NETWORK_STATE");
+        }
         ConnectivityManager cm = (ConnectivityManager) CustomApplication.getSystemServiceOf(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if (ni != null) {

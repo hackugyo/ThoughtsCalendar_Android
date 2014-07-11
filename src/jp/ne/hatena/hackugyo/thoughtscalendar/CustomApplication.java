@@ -17,6 +17,12 @@ import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.webkit.CookieSyncManager;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.HttpStack;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.Volley;
 
 public class CustomApplication extends Application {
     /** コンテキスト. */
@@ -268,5 +274,24 @@ public class CustomApplication extends Application {
 
     public static int getStyleableIdFor(String resourceName) {
         return getResourceIdFor(_context.getResources(), _context.getPackageName(), resourceName, ResourceType.STYLABLE);
+    }
+
+    static HttpStack sHurlStack;
+    private static RequestQueue sRequestQueue;
+
+    public static HttpStack getHttpStack() {
+        if (sHurlStack == null) {
+            CookieSyncManager.createInstance(CustomApplication.getAppContext());
+            sHurlStack = new HurlStack();
+            ;
+        }
+        return sHurlStack;
+    }
+
+    public static RequestQueue getQueue() {
+        if (sRequestQueue == null) {
+            sRequestQueue = Volley.newRequestQueue(getAppContext(), getHttpStack());
+        }
+        return sRequestQueue;
     }
 }

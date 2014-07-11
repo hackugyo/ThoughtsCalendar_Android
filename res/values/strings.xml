@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ThoughtsCalendar</string>
+    <string name="app_name">Philosocial</string>
     <string name="Dialog_Button_Label_Positive">OK</string>
     <string name="Dialog_Button_Label_Negative">キャンセル</string>
     <string name="Separator_Comma">、</string>
     <string name="Dialog_Button_Label_Install">インストール</string>
     <string name="contentDescription_image_default">No Image.</string>
     <string name="text_sample">Sample サンプル sample</string>
-    
+
     <!-- MainActivity -->
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
+    <string name="action_calendar">カレンダー起動</string>
     <string name="action_settings">Settings</string>
-    
+
     <!-- WebViewActivity -->
     <string name="contentDescription_Back">戻る</string>
     <string name="contentDescription_Next">進む</string>
     <string name="contentDescription_Reload">更新</string>
     <string name="contentDescription_Cancel">中止</string>
 
+    <plurals name="list_header_placeholder_events">
+        <item quantity="one">1 event</item>
+        <item quantity="other">%d events</item>
+    </plurals>
+    
 </resources>

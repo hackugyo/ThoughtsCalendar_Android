@@ -26,7 +26,7 @@ public class PackageUtils {
      * @return アイコン
      */
     public static Drawable getAppIcon(PackageManager pm, String packageName) {
-        if (packageName == null) return CustomApplication.getDrawableByName("ic_launcher_default");
+        if (packageName == null) return CustomApplication.getDrawableById(CustomApplication.getDrawableIdFor("ic_launcher_default"));
         if (pm == null) pm = CustomApplication.getAppContext().getPackageManager();
         Drawable icon = null;
         try {
@@ -36,7 +36,7 @@ public class PackageUtils {
         }
         if (icon == null) {
             // FakeIt later, 見つからなかった場合に出すデフォルトのアイコンを準備
-            icon = CustomApplication.getDrawableByName("ic_launcher_default");
+            icon = CustomApplication.getDrawableById(CustomApplication.getDrawableIdFor("ic_launcher_default"));
         }
         return icon;
     }
