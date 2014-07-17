@@ -5,11 +5,15 @@ import java.lang.reflect.Method;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -211,5 +215,74 @@ public class ViewUtils {
             }
         }
         return result;
+    }
+    
+
+    /**
+     * {@link ViewTreeObserver#removeGlobalOnLayoutListener(android.view.ViewTreeObserver.OnGlobalLayoutListener)} 
+     * がdeprecatedになったので，SDK_INTによって処理を変えます．
+     * 
+     * @param obs
+     * @param listener
+     */
+    @SuppressLint("NewApi")
+    @SuppressWarnings({ "deprecation", "javadoc" })
+    public static void removeGlobalOnLayoutListener(ViewTreeObserver obs, OnGlobalLayoutListener listener) {
+        if (obs == null) return;
+        if (Build.VERSION.SDK_INT < 16) {
+            obs.removeGlobalOnLayoutListener(listener);
+        } else {
+            obs.removeOnGlobalLayoutListener(listener);
+        }
+    }
+
+    /**
+     * {@link Display#getWidth()} がdeprecatedになったので，SDK_INTによって処理を変えます．
+     * 
+     * @param display
+     * @return displayの幅（displayがnullのとき0)
+     */
+    @SuppressWarnings({ "deprecation", "javadoc" })
+    public static int getDisplayWidth(Display display) {
+        if (display == null) return 0;
+        Point outSize = new Point();
+        try {
+            // test for new method to trigger exception
+            @SuppressWarnings("rawtypes")
+            Class pointClass = Class.forName("android.graphics.Point");
+            Method newGetSize = Display.class.getMethod("getSize", new Class[] { pointClass });
+
+            // no exception, so new method is available, just use it
+            newGetSize.invoke(display, outSize);
+        } catch (Exception ex) {
+            // new method is not available, use the old ones
+            outSize.x = display.getWidth();
+        }
+        return outSize.x;
+    }
+
+    /**
+     * {@link Display#getHeight()} がdeprecatedになったので，SDK_INTによって処理を変えます．
+     * 
+     * @param display
+     * @return displayの幅（displayがnullのとき0)
+     */
+    @SuppressWarnings({ "deprecation", "javadoc" })
+    public static int getDisplayHeight(Display display) {
+        if (display == null) return 0;
+        Point outSize = new Point();
+        try {
+            // test for new method to trigger exception
+            @SuppressWarnings("rawtypes")
+            Class pointClass = Class.forName("android.graphics.Point");
+            Method newGetSize = Display.class.getMethod("getSize", new Class[] { pointClass });
+
+            // no exception, so new method is available, just use it
+            newGetSize.invoke(display, outSize);
+        } catch (Exception ex) {
+            // new method is not available, use the old ones
+            outSize.y = display.getHeight();
+        }
+        return outSize.y;
     }
 }
