@@ -144,10 +144,17 @@ public final class CalendarUtils {
         return dateStringBuilder.toString();
     }
 
-    public static String getDateTimeSecondString(Calendar calendar) {
+    /**
+     * 
+     * @param calendar
+     * @return "yyyy/MM/dd HH:mm:ss"
+     */
+    public static String getDateTimeSecondString(Calendar calendar, String slash, String separator, String colon) {
         if (calendar == null) return "";
         // Date と SimpleDateFormat を使うと簡潔に書けるが，DateクラスはJavaにおいてdeprecatedなので使用しない．
-        final String slash = "/";
+        if (slash == null) slash = "/";
+        if (separator == null) separator = " ";
+        if (colon == null) colon = ":";
         String monthString = String.format("%1$02d", (calendar.get(Calendar.MONTH) + 1)); // 6を06にするような処理
         String dateString = String.format("%1$02d", calendar.get(Calendar.DATE));
         String hourString = String.format("%1$02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -571,5 +578,49 @@ public final class CalendarUtils {
         } else {
             return c2;
         }
+    }
+
+    public static boolean isValid(String yyyyMMddHHmmss, String slash, String separator, String colon) {
+        if (slash == null) slash = "";
+        if (separator == null) separator = "";
+        if (colon == null) colon = "";
+        int length = 14 + slash.length() + separator.length() + colon.length();
+        if (yyyyMMddHHmmss == null || yyyyMMddHHmmss.length() != length) return false;
+        String yyyyMMdd;
+        String HHmmss;
+        if (separator.length() != 0) {
+            String[] halves = yyyyMMddHHmmss.split(separator);
+            if (halves == null || halves.length != 2) return false;
+            yyyyMMdd = halves[0];
+            HHmmss = halves[1];
+        } else {
+            yyyyMMdd = yyyyMMddHHmmss.substring(0, 6);
+            HHmmss = yyyyMMddHHmmss.substring(6, 14);
+        }
+        Calendar parseGregorianDate;
+        try {
+            parseGregorianDate = parseGregorianDate(yyyyMMdd, slash);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+        try {
+            if (colon.length() != 0) {
+                String[] halves = HHmmss.split(colon);
+                if (halves == null || halves.length != 3) return false;
+                parseGregorianDate.set(Calendar.HOUR_OF_DAY, Integer.valueOf(halves[0]));
+                parseGregorianDate.set(Calendar.MINUTE, Integer.valueOf(halves[1]));
+                parseGregorianDate.set(Calendar.SECOND, Integer.valueOf(halves[2]));
+            } else {
+                parseGregorianDate.set(Calendar.HOUR_OF_DAY, Integer.valueOf(HHmmss.substring(0, 2)));
+                parseGregorianDate.set(Calendar.MINUTE, Integer.valueOf(HHmmss.substring(2, 4)));
+                parseGregorianDate.set(Calendar.SECOND, Integer.valueOf(HHmmss.substring(4, 6)));
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return StringUtils.isSame(//
+                yyyyMMddHHmmss,//
+                CalendarUtils.getDateTimeSecondString(parseGregorianDate, "", "", "")//
+                );
     }
 }

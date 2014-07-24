@@ -12,11 +12,13 @@ import jp.ne.hatena.hackugyo.thoughtscalendar.util.LogUtils;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 
@@ -94,6 +96,10 @@ public class AbsFragment extends Fragment {
      * @return 親の{@link AbsFragmentActivity}
      */
     protected AbsFragmentActivity getActivitySafely() {
+        if (mActivity == null) {
+            FragmentActivity activity = getActivity();
+            if (activity instanceof AbsFragmentActivity) mActivity = (AbsFragmentActivity) activity;
+        }
         return mActivity;
     }
 
@@ -220,6 +226,14 @@ public class AbsFragment extends Fragment {
 
         i.putExtras(extras);
         startActivity(i);
+    }
+    
+    protected void launchMap(String query) {
+        Uri geoUri = Uri.parse("geo:0,0?q=" + query);
+        Intent mapCall = new Intent(Intent.ACTION_VIEW, geoUri);
+        mapCall.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mapCall.setData(geoUri);
+        startActivity(mapCall);
     }
 
     /***********************************************

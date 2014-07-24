@@ -168,4 +168,9 @@ public class ArrayUtils {
         return new ArrayList<T>(Arrays.asList(array));
     }
 
+    public static <T>  ArrayList<T> asList(List<? extends T> list) {
+        if (list == null) return null;
+        return new ArrayList<T>(list);
+    }
+
 }

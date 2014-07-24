@@ -36,7 +36,7 @@ import com.android.volley.toolbox.Volley;
 public abstract class AbsApiFragment<T> extends AbsFragment implements Response.Listener<T>, Response.ErrorListener, Callbacks, ProgressCallbacks {
     protected static final String API = "AbsJsonApiFragment#API";
     protected static final String TAG_RETRY = "LoginFragment#TAG_RETRY";
-    private final AbsApiFragment self = this;
+    private final AbsApiFragment<T> self = this;
     private RequestQueue mQueue;
     private HashMap<String, Response.Listener<T>> mOnResponseListeners = new HashMap<String, Response.Listener<T>>();
     private HashMap<String, Response.ErrorListener> mOnErrorListeners = new HashMap<String, Response.ErrorListener>();
@@ -169,7 +169,7 @@ public abstract class AbsApiFragment<T> extends AbsFragment implements Response.
             return;
         }
 
-        Request request = createRequest(method, apiUrl, listener, errorListener);
+        Request<T> request = createRequest(method, apiUrl, listener, errorListener);
         request.setTag(listenerTag); // キャンセル用
         request.setShouldCache(false);
 
