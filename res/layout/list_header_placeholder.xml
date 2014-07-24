@@ -20,11 +20,25 @@
         </ImageView>
 
         <TextView
-            android:id="@android:id/text1"
-            android:layout_width="match_parent"
+            android:id="@+id/list_header_placeholder_date"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dip"
             android:layout_toRightOf="@+id/list_header_placeholder_icon"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingStart="?android:attr/listPreferredItemPaddingLeft"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textColor="@color/list_row_placeholder_header_text" />
+
+        <TextView
+            android:id="@+id/list_header_placeholder_items"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|right"
+            android:layout_marginTop="8dip"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/list_header_placeholder_date"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingStart="?android:attr/listPreferredItemPaddingLeft"
             android:singleLine="true"

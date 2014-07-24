@@ -142,7 +142,8 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                 R.id.list_row_placeholder_expandable_button_b,//
                 R.id.list_row_placeholder_expandable_button_c,//
                 R.id.list_row_placeholder_expandable_button_d,//
-                android.R.id.text2);
+                android.R.id.text2,//
+                R.id.list_row_placeholder_location_icon);
         mWrappedAdapter.setAnimationDuration(100);
     }
 
@@ -218,6 +219,9 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                         TwitterUtils.sendText(getActivitySafely(),//
                                 StringUtils.build(" #", hashTag)//
                                 );
+                        break;
+                    case R.id.list_row_placeholder_location_icon: //
+                        launchMapByLocation(location);
                         break;
                     case android.R.id.text2:// 地図表示
                         launchMapByLocation(location);

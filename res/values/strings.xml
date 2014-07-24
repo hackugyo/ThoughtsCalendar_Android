@@ -24,8 +24,10 @@
     <string name="contentDescription_Reload">更新</string>
     <string name="contentDescription_Cancel">中止</string>
 
+    <string name="list_header_placeholder_event">%d event</string>
+    <string name="list_header_placeholder_events">%d events</string>
     <plurals name="list_header_placeholder_events">
-        <item quantity="one">1 event</item>
+        <item quantity="one">%d event</item>
         <item quantity="other">%d events</item>
     </plurals>
     

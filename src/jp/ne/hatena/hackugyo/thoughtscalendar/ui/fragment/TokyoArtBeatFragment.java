@@ -110,6 +110,7 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
         // Expandable Cellのボタンにリスナを配置
         mWrappedAdapter.setItemActionListener(getExpandActionListener(), //
                 android.R.id.text2,//
+                R.id.list_row_placeholder_location_icon,
                 R.id.list_row_placeholder_expandable_button_a, //
                 R.id.list_row_placeholder_expandable_button_b,//
                 R.id.list_row_placeholder_expandable_button_c,//
@@ -159,14 +160,33 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
                     case R.id.list_row_placeholder_expandable_button_d:
                         TwitterUtils.sendText(getActivitySafely(), StringUtils.build(" #", hashTag));
                         break;
+
+                    case R.id.list_row_placeholder_location_icon: //
+                        launchMapByLocation(event.getAddress(), event.getLocation());
+                        break;
                     case android.R.id.text2:// 地図表示
-                        launchMap(event.getAddress());
+                        launchMapByLocation(event.getAddress(), event.getLocation());
                         break;
                     default:
                         break;
                 }
             }
         };
+    }
+    
+    
+    private void launchMapByLocation(String address, CharSequence location) {
+        String alertMessage = StringUtils.build(//
+                "このイベントは、", //
+                (StringUtils.isEmpty(location) ? "開催場所不明です。" : location),//
+                (StringUtils.isEmpty(location) ? "" : "で開催されます。\n")//
+                );
+        showSingleToast(alertMessage, Toast.LENGTH_LONG);
+        if( StringUtils.isPresent(address))  {
+            launchMap(address);
+        } else  if( StringUtils.isPresent(location)) {
+            launchMap(location.toString());
+        }
     }
 
     /***********************************************

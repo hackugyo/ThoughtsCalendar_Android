@@ -1,9 +1,11 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.ui.adapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendStatus;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
@@ -22,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.LruImageCache;
 import com.android.volley.toolbox.NetworkImageView;
 
 public class PlaceholderListAdapter extends CursorAdapter {
@@ -42,9 +46,11 @@ public class PlaceholderListAdapter extends CursorAdapter {
     private int mViewTypesCount = 1;
 
     public ArrayList<AttendingEvent> mAttendingEvents;
+    private ImageLoader mImageLoader;
 
-    public static class HeaderViewHolder {
+    static class HeaderViewHolder {
         public TextView textView;
+        public TextView countView;
     }
 
     class ViewHolder {
@@ -85,21 +91,23 @@ public class PlaceholderListAdapter extends CursorAdapter {
         if (c != null) {
             // 最初に，セクションがどこに収まるかを確認しておく．
             sectionsIndexer = calculateSectionHeaders();
-            c.registerDataSetObserver(mDataSetObserver);
+            c.registerDataSetObserver(mMyDataSetObserver);
         }
         
         mAttendingEvents = ArrayUtils.asList(AttendingEvent.findEvents(context, authority));
-        
+        mImageLoader = new ImageLoader(CustomApplication.getQueue(), new LruImageCache());
     }
 
     /**
      * データセット変更を監視．
      */
-    private DataSetObserver mDataSetObserver = new DataSetObserver() {
+    private DataSetObserver mMyDataSetObserver = new DataSetObserver() {
+        @Override
         public void onChanged() {
             sectionsIndexer = calculateSectionHeaders();
         };
 
+        @Override
         public void onInvalidated() {
             sectionsIndexer.clear();
         };
@@ -185,13 +193,13 @@ public class PlaceholderListAdapter extends CursorAdapter {
     @Override
     public Cursor swapCursor(Cursor newCursor) {
         if (getCursor() != null) {
-            getCursor().unregisterDataSetObserver(mDataSetObserver);
+            getCursor().unregisterDataSetObserver(mMyDataSetObserver);
         }
 
         final Cursor oldCursor = super.swapCursor(newCursor);
         sectionsIndexer = calculateSectionHeaders();
         if (newCursor != null) {
-            newCursor.registerDataSetObserver(mDataSetObserver);
+            newCursor.registerDataSetObserver(mMyDataSetObserver);
         }
 
         return oldCursor;
@@ -213,7 +221,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
                 return mInflater.inflate(mHeaderLayoutId, parent, false);
             }
             // 通常アイテムなので，positionだけずらす
-            final int mapCursorPos = getSectionForPosition(position);
+            final int mapCursorPos = getCursorPosition(position);
             c.moveToPosition(mapCursorPos);
             return super.getView(mapCursorPos, convertView, parent);
         } else {
@@ -221,7 +229,8 @@ public class PlaceholderListAdapter extends CursorAdapter {
             if (convertView == null) {
                 holder = new HeaderViewHolder();
                 convertView = mInflater.inflate(mHeaderLayoutId, parent, false);
-                holder.textView = (TextView) convertView.findViewById(android.R.id.text1);
+                holder.textView = (TextView) convertView.findViewById(R.id.list_header_placeholder_date);
+                holder.countView = (TextView) convertView.findViewById(R.id.list_header_placeholder_items);
                 convertView.setTag(holder);
             } else {
                 holder = (HeaderViewHolder) convertView.getTag();
@@ -230,7 +239,13 @@ public class PlaceholderListAdapter extends CursorAdapter {
             final String group = sectionsIndexer.get(position);
             final String customFormat = getGroupCustomFormat(group);
             sectionText.setText(customFormat == null ? group : customFormat);
-
+            final int currentSection = getSectionForPosition(position);
+            final int nextSection = currentSection + 1;
+            final int count = getPositionForThisSection(nextSection) - position - 1;
+            // 日本語設定の場合prulalsは役に立たない．
+            // String string = convertView.getResources().getQuantityString(R.plurals.list_header_placeholder_events, count, count)
+            String string = convertView.getResources().getString((count != 1 ? R.string.list_header_placeholder_events :R.string.list_header_placeholder_event) , count);
+            holder.countView.setText(string);
             return convertView;
         }
     }
@@ -307,7 +322,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
     @Override
     public Object getItem(int position) {
         if (getItemViewType(position) == TYPE_NORMAL) {
-            return super.getItem(getSectionForPosition(position));
+            return super.getItem(getCursorPosition(position));
         }
         return super.getItem(position);
     }
@@ -315,7 +330,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
     @Override
     public long getItemId(int position) {
         if (getItemViewType(position) == TYPE_NORMAL) {
-            return super.getItemId(getSectionForPosition(position));
+            return super.getItemId(getCursorPosition(position));
         }
         return super.getItemId(position);
     }
@@ -327,6 +342,15 @@ public class PlaceholderListAdapter extends CursorAdapter {
         }
         return TYPE_HEADER;
     }
+    
+    public int getPositionForThisSection(int section) {
+        ArrayList<Integer> arrayList = new ArrayList<Integer>(sectionsIndexer.keySet());
+        Collections.sort(arrayList);
+        if (arrayList.size() <= section) {
+            return getCount();
+        }
+        return arrayList.get(section);
+    }
 
     /**
      * セクションの開始positionを返します．
@@ -337,9 +361,13 @@ public class PlaceholderListAdapter extends CursorAdapter {
         }
         return section;
     }
+    
+    public int getItemPositionForPosition(int position) {
+        return position - getSectionForPosition(position);
+    }
 
     /**
-     * positionが入っているセクションを返します．
+     * positionが入っているセクションを割り出します．
      */
     public int getSectionForPosition(int position) {
         int offset = 0;
@@ -350,8 +378,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
                 break;
             }
         }
-
-        return position - offset;
+        return offset;
     }
 
     /**
@@ -361,7 +388,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
      * @return cursor上のposition
      */
     public int getCursorPosition(int position) {
-        return getSectionForPosition(position);
+        return getItemPositionForPosition(position);
     }
     
     public boolean includeEventId(String eventId) {
