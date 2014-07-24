@@ -1,10 +1,8 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.ui.activity;
 
-import java.util.ArrayList;
-
-import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.AbsFragmentActivity;
+import jp.ne.hatena.hackugyo.thoughtscalendar.ui.adapter.SectionsPagerAdapter;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.fragment.PlaceholderFragment;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.fragment.dialogfragment.AbsCustomAlertDialogFragment.Callbacks;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
@@ -13,8 +11,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -24,7 +20,6 @@ import android.view.MenuItem;
 
 public class MainActivity extends AbsFragmentActivity implements ActionBar.TabListener, Callbacks {
 
-    private static final ArrayList<String> sCalendarNames = CustomApplication.getStringArrayById(R.array.list_calendar_names);
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a {@link FragmentPagerAdapter}
@@ -116,35 +111,6 @@ public class MainActivity extends AbsFragmentActivity implements ActionBar.TabLi
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return sCalendarNames.size() <= position ? null : sCalendarNames.get(position);
-        }
     }
 
     @Override

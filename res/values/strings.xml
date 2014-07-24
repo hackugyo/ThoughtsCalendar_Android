@@ -8,6 +8,8 @@
     <string name="Dialog_Button_Label_Install">インストール</string>
     <string name="contentDescription_image_default">No Image.</string>
     <string name="text_sample">Sample サンプル sample</string>
+    <string name="Error_Message_NoNetworkConnection">ネットワーク接続に失敗しました。電波状況をご確認の上再度お試しください。</string>
+    <string name="Error_Message_UnexpectedError">アプリエラーが発生しました。</string>
 
     <!-- MainActivity -->
     <string name="title_section1">Section 1</string>

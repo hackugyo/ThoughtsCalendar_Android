@@ -356,6 +356,13 @@ public final class CalendarUtils {
         return parseGregorianDate(yyyyMMdd, true);
     }
 
+    public static Calendar parseGregorianDate(String yyyyMMdd, String separator) {
+        if (StringUtils.isEmpty(yyyyMMdd)) return null;
+        if (yyyyMMdd.contains("/")) yyyyMMdd = yyyyMMdd.replace("/", "");
+        if (yyyyMMdd.contains(separator)) yyyyMMdd = yyyyMMdd.replace(separator, "");
+        return parseGregorianDate(yyyyMMdd, true);
+    }
+
     public static Calendar parseGregorianDate(String yyyyMMdd, boolean isLenient) {
         Calendar calendar = CalendarUtils.getCleanInstance();
         calendar.setLenient(isLenient); // 20110230を2012年03月2日と好意的に解釈しない

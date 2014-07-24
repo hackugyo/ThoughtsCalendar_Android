@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
+    
+    <color name="app_theme_color">#ec7c68</color>
+    
     <color name="background_tabs">#f9f9f9</color>
     <color name="attended_cell">#66ec7c68</color>
     
