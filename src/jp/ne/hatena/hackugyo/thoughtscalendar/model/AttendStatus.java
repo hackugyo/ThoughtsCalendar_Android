@@ -34,8 +34,9 @@ public class AttendStatus {
         return result;
     }
 
-    public static void setAttendStatus(String eventId, boolean isAttend) {
-        if (sAttendStatusCash.get(eventId) == isAttend) return;
+    @Deprecated
+    public static void setAttendStatus(String eventId, Boolean isAttend) {
+        if (sAttendStatusCash.containsKey(eventId) && sAttendStatusCash.get(eventId) == isAttend) return;
         DB db = null;
         Context context = CustomApplication.getAppContext();
         try {

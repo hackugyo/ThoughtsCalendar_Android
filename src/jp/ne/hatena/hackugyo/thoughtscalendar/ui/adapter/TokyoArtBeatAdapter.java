@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
-import jp.ne.hatena.hackugyo.thoughtscalendar.model.TokyoArtBeatEvent;
+import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -22,14 +22,14 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
     @SuppressWarnings("unused")
     private final TokyoArtBeatAdapter self = this;
 
-    ArrayList<TokyoArtBeatEvent> mPeriods = new ArrayList<TokyoArtBeatEvent>();
+    ArrayList<AttendingEvent> mPeriods = new ArrayList<AttendingEvent>();
     private LayoutInflater mInflater;
 
     private Context mContext;
 
     private ImageLoader mImageLoader;
 
-    public TokyoArtBeatAdapter(Context context, ArrayList<TokyoArtBeatEvent> items) {
+    public TokyoArtBeatAdapter(Context context, ArrayList<AttendingEvent> items) {
         super();
         mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -56,16 +56,16 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        TokyoArtBeatEvent event = (TokyoArtBeatEvent) getItem(position);
+        AttendingEvent event = (AttendingEvent) getItem(position);
         convertView = setupConvertView(event, mInflater, position, convertView, parent);
         return convertView;
     }
 
-    public void setItems(ArrayList<TokyoArtBeatEvent> items) {
+    public void setItems(ArrayList<AttendingEvent> items) {
         mPeriods = items;
     }
 
-    private View setupConvertView(TokyoArtBeatEvent event, LayoutInflater inflater, int position, View convertView, ViewGroup parent) {
+    private View setupConvertView(AttendingEvent event, LayoutInflater inflater, int position, View convertView, ViewGroup parent) {
         if (inflater == null) return null;
 
         ViewHolder holder;
@@ -89,13 +89,13 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (event != null) {// TODO 20140716 びゅーをeventで埋める
+        if (event != null) {
             holder.title.setText(event.getTitle());
             holder.begin.setText(CalendarUtils.getDateStringWithoutYear(event.getDateFrom(), "/") + " 〜 ");
 
-            holder.location.setText(event.getAddress());
+            holder.location.setText(event.getLocation());
 
-            final boolean willAttend = false; // FakeIt 参加有無はDBからとる
+            final boolean willAttend = event.getAttending();
             holder.attendStatus.setBackgroundColor(//
                     inflater.getContext().getResources().getColor(//
                             willAttend ? R.color.attended_cell : android.R.color.transparent)//
@@ -105,7 +105,6 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
                             willAttend ? R.color.attended_cell : android.R.color.transparent)//
                     );
             holder.favoriteButton.setImageResource(willAttend ? R.drawable.ic_favorite : R.drawable.ic_unfavorite);
-
             holder.background.setImageUrl(event.getImageUrl(), mImageLoader);
 
         }

@@ -1,13 +1,17 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.ui.adapter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendStatus;
+import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.fragment.PlaceholderFragmentHelper;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.ArrayUtils;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
-import jp.ne.hatena.hackugyo.thoughtscalendar.util.LogUtils;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.StringUtils;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -40,6 +44,8 @@ public class PlaceholderListAdapter extends CursorAdapter {
     private int mColumnForGrouping;
     private int mViewTypesCount = 1;
 
+    public ArrayList<AttendingEvent> mAttendingEvents;
+
     public static class HeaderViewHolder {
         public TextView textView;
     }
@@ -66,11 +72,11 @@ public class PlaceholderListAdapter extends CursorAdapter {
      * @param autoRequery
      */
     public PlaceholderListAdapter(Context context, Cursor c, boolean autoRequery) {
-        this(context, c, autoRequery, 0, 0);
+        this(context, c, autoRequery, 0, 0, AttendingEvent.AUTHORITY_TOKYO_ART_BEAT);
     }
 
     public PlaceholderListAdapter(Context context, Cursor c, boolean autoRequery, //
-            int headerLayoutId, int columnForGrouping) {
+            int headerLayoutId, int columnForGrouping, String authority) {
         super(context, c, autoRequery);
 
         mViewTypesCount = (headerLayoutId <= 0 ? 1 : 2);
@@ -84,6 +90,9 @@ public class PlaceholderListAdapter extends CursorAdapter {
             sectionsIndexer = calculateSectionHeaders();
             c.registerDataSetObserver(mDataSetObserver);
         }
+        
+        mAttendingEvents = ArrayUtils.asList(AttendingEvent.findEvents(context, authority));
+        
     }
 
     /**
@@ -121,7 +130,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
         time.set(Long.parseLong(begin));
         holder.begin.setText(CalendarUtils.getTimeString(CalendarUtils.getInstance(time.toMillis(false))) + " 〜 ");
 
-        final boolean willAttend = AttendStatus.getAttendStatus(eventId);
+        final boolean willAttend = AttendStatus.getAttendStatus(eventId) || includeEventId(eventId, mAttendingEvents);
         holder.attendStatus.setBackgroundColor(//
                 context.getResources().getColor(//
                         willAttend ? R.color.attended_cell : android.R.color.transparent)//
@@ -147,12 +156,6 @@ public class PlaceholderListAdapter extends CursorAdapter {
         }
         holder.background.setImageUrl(url, new ImageLoader(CustomApplication.getQueue(), new LruImageCache()));
 
-        holder.showDetailButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LogUtils.i("oops");
-            }
-        });
         //holder.descrition.setText(description);
     }
 
@@ -168,7 +171,6 @@ public class PlaceholderListAdapter extends CursorAdapter {
         holder.title = (TextView) view.findViewById(android.R.id.text1);
         holder.location = (TextView) view.findViewById(android.R.id.text2);
         holder.begin = (TextView) view.findViewById(R.id.list_row_placeholder_datetime);
-        //holder.url = (TextView) view.findViewById(R.id.url);
         holder.background = (NetworkImageView) view.findViewById(R.id.list_row_network_image_view);
         holder.attendStatus = view.findViewById(R.id.list_row_placeholder_flag);
         holder.attendStatusExpand = view.findViewById(R.id.list_row_placeholder_flag_expandable);
@@ -377,5 +379,16 @@ public class PlaceholderListAdapter extends CursorAdapter {
      */
     public int getCursorPosition(int position) {
         return getSectionForPosition(position);
+    }
+    
+    public boolean includeEventId(String eventId) {
+        return includeEventId(eventId, mAttendingEvents);
+    }
+    
+    private static boolean includeEventId(String eventId, List<AttendingEvent> attendingEvents) {
+        for (AttendingEvent e : attendingEvents) {
+            if (StringUtils.isSame(eventId, e.eventId) && e.attending) return true;
+        }
+        return false;
     }
 }

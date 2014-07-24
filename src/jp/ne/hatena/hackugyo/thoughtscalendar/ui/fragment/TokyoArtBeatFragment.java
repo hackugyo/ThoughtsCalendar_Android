@@ -4,26 +4,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
+import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.TokyoArtBeatEvent;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.adapter.TokyoArtBeatAdapter;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.ArrayUtils;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.LogUtils;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.StringUtils;
+import jp.ne.hatena.hackugyo.thoughtscalendar.util.TwitterUtils;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.InputStreamRequest;
-import com.tjerkw.slideexpandable.library.AbstractSlideExpandableListAdapter.OnItemExpandCollapseListener;
 import com.tjerkw.slideexpandable.library.ActionSlideExpandableListAdapter;
 import com.tjerkw.slideexpandable.library.ActionSlideExpandableListView.OnActionClickListener;
 
@@ -31,6 +39,7 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
     @SuppressWarnings("unused")
     private final TokyoArtBeatFragment self = this;
     ListView mListView;
+    TextView mEmptyView;
     private TokyoArtBeatAdapter mAdapter;
     private ActionSlideExpandableListAdapter mWrappedAdapter;
 
@@ -54,8 +63,8 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View onCreateView = inflater.inflate(R.layout.fragment_placeholder, container, false);
-        mAdapter = new TokyoArtBeatAdapter(getActivitySafely(), new ArrayList<TokyoArtBeatEvent>());
+        View onCreateView = inflater.inflate(R.layout.fragment_tokyoartbeat_list, container, false);
+        mAdapter = new TokyoArtBeatAdapter(getActivitySafely(), new ArrayList<AttendingEvent>());
         mWrappedAdapter = new ActionSlideExpandableListAdapter(//
                 mAdapter,//
                 R.id.list_row_placeholder_cell, //
@@ -79,7 +88,24 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
                 // ignored.
             }
         });
-        mListView.setEmptyView((TextView) parentView.findViewById(android.R.id.empty));
+        mEmptyView = (TextView) parentView.findViewById(android.R.id.empty);
+        mEmptyView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchExternalBrowser("http://www.tokyoartbeat.com");
+            }
+        });
+        mListView.setEmptyView(mEmptyView);
+
+        LayoutInflater inflater = LayoutInflater.from(parentView.getContext());
+        TextView footer = (TextView) inflater.inflate(R.layout.list_footer_tokyoartbeat, null);
+        footer.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchExternalBrowser("http://www.tokyoartbeat.com");
+            }
+        });
+        mListView.addFooterView(footer);
 
         // Expandable Cellのボタンにリスナを配置
         mWrappedAdapter.setItemActionListener(getExpandActionListener(), //
@@ -88,7 +114,6 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
                 R.id.list_row_placeholder_expandable_button_b,//
                 R.id.list_row_placeholder_expandable_button_c,//
                 R.id.list_row_placeholder_expandable_button_d);
-        mWrappedAdapter.setItemExpandCollapseListener(getOnItemExpandCollapseListener());
         mWrappedAdapter.setAnimationDuration(100);
     }
 
@@ -101,21 +126,45 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
 
             @Override
             public void onClick(View itemView, View clickedView, int position) {
-                TokyoArtBeatEvent item = (TokyoArtBeatEvent) mAdapter.getItem(position);
-                LogUtils.i("きただよ  " + item.getAddress());
-            }
-        };
-    }
+                AttendingEvent event = (AttendingEvent) mAdapter.getItem(position);
 
-    private OnItemExpandCollapseListener getOnItemExpandCollapseListener() {
-        return new OnItemExpandCollapseListener() {
+                String title = event.getTitle();
+                CharSequence when = CalendarUtils.getDateString(event.getDateFrom());
+                when = when.subSequence(0, Math.min(when.length(), 10));
+                String hashTag = PlaceholderFragmentHelper.createHashTag(title, when);
 
-            @Override
-            public void onExpand(View itemView, int position) {
-            }
-
-            @Override
-            public void onCollapse(View itemView, int position) {
+                final int clickedViewId = clickedView.getId();
+                switch (clickedViewId) {
+                    case R.id.list_row_placeholder_expandable_button_a:
+                        TwitterUtils.searchByHashTag(getActivitySafely(), hashTag);
+                        break;
+                    case R.id.list_row_placeholder_expandable_button_b:
+                        boolean willAttendCurrently = event.getAttending();
+                        if (!willAttendCurrently) {
+                            showSingleToast("Twitterで参加表明しましょう！", Toast.LENGTH_SHORT);
+                            TwitterUtils.sendText(getActivitySafely(),//
+                                    StringUtils.build(//
+                                            title, "(", when, "開催)に行きます！ #", hashTag)//
+                                    );
+                        }
+                        event.setAttending(!willAttendCurrently);
+                        TokyoArtBeatFragmentHelper.saveToAttend(getActivity(), event, hashTag, AttendingEvent.AUTHORITY_TOKYO_ART_BEAT);
+                        mAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.list_row_placeholder_expandable_button_c:
+                        final String url = event.getDetailUrl();
+                        LogUtils.i("  " + url);
+                        if (StringUtils.isPresent(url)) launchExternalBrowser(url);
+                        break;
+                    case R.id.list_row_placeholder_expandable_button_d:
+                        TwitterUtils.sendText(getActivitySafely(), StringUtils.build(" #", hashTag));
+                        break;
+                    case android.R.id.text2:// 地図表示
+                        launchMap(event.getAddress());
+                        break;
+                    default:
+                        break;
+                }
             }
         };
     }
@@ -133,7 +182,7 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
 
     @Override
     public void onResponse(InputStream response) {
-        ArrayList<TokyoArtBeatEvent> data = TokyoArtBeatFragmentHelper.parseXml(response);
+        ArrayList<AttendingEvent> data = TokyoArtBeatFragmentHelper.parseXml(response);
         try {
             response.close();
         } catch (IOException e) {
@@ -144,11 +193,35 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        if (mEmptyView != null) {
+            mEmptyView.setText(R.string.tokyoArtBeat_nothing);
+        }
     }
 
-    private void onParseXml(ArrayList<TokyoArtBeatEvent> data) {
+    private void onParseXml(ArrayList<AttendingEvent> data) {
+        // DBに保存済みのイベントを追加する
+        List<AttendingEvent> findEvents = AttendingEvent.findEvents(getActivitySafely(), AttendingEvent.AUTHORITY_TOKYO_ART_BEAT);
+        if (findEvents != null) {
+            Iterator<AttendingEvent> eventIterator = data.iterator();
+            while (eventIterator.hasNext()) {
+                AttendingEvent event = eventIterator.next();
+                if (findEvents.contains(event)) {
+                    int indexOf = findEvents.indexOf(event);
+                    event.setAttending(findEvents.get(indexOf).attending);
+                    findEvents.remove(event);
+                }
+            }
+            data = new ArrayList<AttendingEvent>(ArrayUtils.concatList(findEvents, data));
+        }
+        
         Collections.sort(data, TokyoArtBeatEvent.ascending());
+        
         mAdapter.setItems(data);
         mAdapter.notifyDataSetChanged();
+        if (data == null || data.isEmpty()) {
+            if (mEmptyView != null) {
+                mEmptyView.setText(R.string.tokyoArtBeat_nothing);
+            }
+        }
     }
 }

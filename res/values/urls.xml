@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="api_tokyoartbeat_top">http://www.tokyoartbeat.com</string>
+    <string name="api_tokyoartbeat_comingsoon">http://www.tokyoartbeat.com/list/event_comingsoon.ja.xml</string>
+
+</resources>

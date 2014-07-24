@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendStatus;
+import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.AbsFragment;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.adapter.PlaceholderListAdapter;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
@@ -26,7 +27,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tjerkw.slideexpandable.library.AbstractSlideExpandableListAdapter.OnItemExpandCollapseListener;
 import com.tjerkw.slideexpandable.library.ActionSlideExpandableListAdapter;
 import com.tjerkw.slideexpandable.library.ActionSlideExpandableListView.OnActionClickListener;
 
@@ -58,6 +58,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
     private PlaceholderListAdapter mAdapter;
     private ActionSlideExpandableListAdapter mWrappedAdapter;
     private TextView mEmptyView;
+    private String mAuthority;
 
     public PlaceholderFragment() {
     }
@@ -67,18 +68,13 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
      **********************************************/
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View onCreateView = inflater.inflate(R.layout.fragment_placeholder, container, false);
 
+        mAuthority = PlaceholderFragmentHelper.sCalendarOwners.get(getArguments().getInt(PlaceholderFragment.ARG_SECTION_NUMBER, 1) - 1);
         final int rowForDateTime = 2;
         mAdapter = new PlaceholderListAdapter(getActivitySafely(), null, false, //
-                R.layout.list_header_placeholder, rowForDateTime);
+                R.layout.list_header_placeholder, rowForDateTime, mAuthority);
 
         mWrappedAdapter = new ActionSlideExpandableListAdapter(//
                 mAdapter,//
@@ -145,8 +141,8 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                 R.id.list_row_placeholder_expandable_button_a, //
                 R.id.list_row_placeholder_expandable_button_b,//
                 R.id.list_row_placeholder_expandable_button_c,//
-                R.id.list_row_placeholder_expandable_button_d);
-        mWrappedAdapter.setItemExpandCollapseListener(getOnItemExpandCollapseListener());
+                R.id.list_row_placeholder_expandable_button_d,//
+                android.R.id.text2);
         mWrappedAdapter.setAnimationDuration(100);
     }
 
@@ -159,10 +155,10 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
             @SuppressLint("NewApi")
             @Override
             public void onClick(View v) {
-                String calendarId = PlaceholderFragmentHelper.sCalendarOwners.get(getArguments().getInt(PlaceholderFragment.ARG_SECTION_NUMBER, 1) - 1);
+                
 
                 String urlString = StringUtils.build("https://www.google.com/calendar/render?cid=",//
-                        calendarId);
+                        mAuthority);
                 launchExternalBrowser(urlString);
             }
         });
@@ -204,7 +200,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                         TwitterUtils.searchByHashTag(getActivitySafely(), hashTag);
                         break;
                     case R.id.list_row_placeholder_expandable_button_b:
-                        boolean willAttendCurrently = AttendStatus.getAttendStatus(eventId);
+                        boolean willAttendCurrently = AttendStatus.getAttendStatus(eventId) || mAdapter.includeEventId(eventId);
                         if (!willAttendCurrently) {
                             showSingleToast("Twitterで参加表明しましょう！", Toast.LENGTH_SHORT);
                             TwitterUtils.sendText(getActivitySafely(),//
@@ -212,7 +208,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                                             title, "(", when, "開催)に参加します！ #", hashTag)//
                                     );
                         }
-                        AttendStatus.setAttendStatus(eventId, !willAttendCurrently);
+                        saveToAttend(position, hashTag, !willAttendCurrently);
                         mAdapter.notifyDataSetChanged();
                         break;
                     case R.id.list_row_placeholder_expandable_button_c:
@@ -223,38 +219,52 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                                 StringUtils.build(" #", hashTag)//
                                 );
                         break;
+                    case android.R.id.text2:// 地図表示
+                        launchMapByLocation(location);
+                        break;
                     default:
                         break;
                 }
 
             }
+
         };
     }
+    
+    private void launchMapByLocation(String location) {
+        String alertMessage = StringUtils.build(//
+                "このイベントは、", //
+                (StringUtils.isEmpty(location) ? "開催場所不明です。" : location),//
+                (StringUtils.isEmpty(location) ? "" : "で開催されます。\n")//
+                );
+        showSingleToast(alertMessage, Toast.LENGTH_LONG);
+        if( StringUtils.isPresent(location))  launchMap(location);
+    }
 
-    private OnItemExpandCollapseListener getOnItemExpandCollapseListener() {
-        return new OnItemExpandCollapseListener() {
+    private void saveToAttend(int position, String hashTag, boolean willAttend) {
 
-            @Override
-            public void onExpand(View itemView, int position) {
-                if (mAdapter.getItemViewType(position) == PlaceholderListAdapter.TYPE_HEADER) {
-                    return;
-                }
-                final Cursor cursor = mAdapter.getCursor();
-                cursor.moveToPosition(mAdapter.getCursorPosition(position));
-                final String location = cursor.getString(5);
-                String alertMessage = StringUtils.build(//
-                        "このイベントは、", //
-                        (StringUtils.isEmpty(location) ? "開催場所不明です。" : location),//
-                        (StringUtils.isEmpty(location) ? "" : "で開催されます。\n")//
-                        );
-                showSingleToast(alertMessage, Toast.LENGTH_LONG);
-            }
+        final Cursor cursor = mAdapter.getCursor();
+        cursor.moveToPosition(mAdapter.getCursorPosition(position));
 
-            @Override
-            public void onCollapse(View itemView, int position) {
-                // nothing to do.
-            }
-        };
+        AttendingEvent event = new AttendingEvent();
+        event.eventId = cursor.getString(1);
+        event.ownersAccount = PlaceholderFragmentHelper.sCalendarOwners.get(getArguments().getInt(PlaceholderFragment.ARG_SECTION_NUMBER, 1) - 1);
+        event.title = cursor.getString(4);
+        event.begin = CalendarUtils.getDate(Long.parseLong(cursor.getString(2)));
+        event.location = cursor.getString(5);
+        event.address = event.location; // 住所はとれないので場所名で代用する
+        event.hashTag = hashTag;
+        event.description = ""; // TODO 20140717 詳細情報はとれるかも？
+        event.detailUrl = cursor.getString(6);
+        event.imageUrl = "";
+        event.attending = willAttend;
+
+        event.save(getActivitySafely());
+        if (event.attending) {
+            mAdapter.mAttendingEvents.add(event);
+        } else {
+            mAdapter.mAttendingEvents.remove(event);
+        }
     }
 
 }
