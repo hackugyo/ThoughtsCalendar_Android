@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendStatus;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
@@ -23,8 +22,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.LruImageCache;
 import com.android.volley.toolbox.NetworkImageView;
 
 public class PlaceholderListAdapter extends CursorAdapter {
@@ -141,21 +138,6 @@ public class PlaceholderListAdapter extends CursorAdapter {
                 );
         holder.favoriteButton.setImageResource(willAttend ? R.drawable.ic_favorite : R.drawable.ic_unfavorite);
 
-        // TODO 画像検索APIなどを使って正しい画像を取得する，どこかでキャッシュしないとだめそう
-
-        String url = "http://htmlgiant.com/wp-content/uploads/2013/07/hegel.jpg";
-        switch (cursor.getPosition() % 3) {
-            case 0:
-                url = "http://philosophyforchange.files.wordpress.com/2013/06/sartre.jpeg";
-                break;
-            case 1:
-                url = "http://k1naka-essey.c.blog.so-net.ne.jp/_images/blog/_f88/k1naka-essey/E7ABB9E4B8ADE88BB1E5A4AAE9838EE3808CE696B0E99D92E5B9B4E3808DE698ADE5928CEFBC93E5B9B47E69C88E58FB7E794B2E8B380E4B889E9838EE3808CE791A0E79283E78E8BE381AEE791A0E79283E78E89E3808DEFBC92.jpg?c=a1";
-                break;
-            default:
-                break;
-        }
-        holder.background.setImageUrl(url, new ImageLoader(CustomApplication.getQueue(), new LruImageCache()));
-
         //holder.descrition.setText(description);
     }
 
@@ -172,6 +154,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
         holder.location = (TextView) view.findViewById(android.R.id.text2);
         holder.begin = (TextView) view.findViewById(R.id.list_row_placeholder_datetime);
         holder.background = (NetworkImageView) view.findViewById(R.id.list_row_network_image_view);
+        holder.background.setDefaultImageResId(R.color.image_mask);
         holder.attendStatus = view.findViewById(R.id.list_row_placeholder_flag);
         holder.attendStatusExpand = view.findViewById(R.id.list_row_placeholder_flag_expandable);
         holder.favoriteButton = (ImageButton) view.findViewById(R.id.list_row_placeholder_expandable_button_b);
