@@ -27,7 +27,7 @@ import com.j256.ormlite.table.DatabaseTable;
  */
 @DatabaseTable(tableName = "t_event")
 public class AttendingEvent {
-    
+
     public static final String AUTHORITY_TOKYO_ART_BEAT = "tokyoartbeat";
 
     public static final String COLUMN_NAME_PRIMARY_KEY = "primaryKey";
@@ -40,6 +40,7 @@ public class AttendingEvent {
     public static final String COLUMN_NAME_DESCRIPTION = "description";
     public static final String COLUMN_NAME_DETAIL_URL = "detailUrl";
     public static final String COLUMN_NAME_BEGIN = "begin";
+    public static final String COLUMN_NAME_END = "end";
     public static final String COLUMN_NAME_ATTENDING = "attending";
     public static final String COLUMN_NAME_HASHTAG = "hashTag";
     public static final String COLUMN_NAME_CREATEDAT = "createdAt";
@@ -59,6 +60,9 @@ public class AttendingEvent {
     /** 開始日時 */
     @DatabaseField(columnName = COLUMN_NAME_BEGIN, dataType = DataType.DATE_LONG)
     public java.util.Date begin;
+    /** 終了日時 */
+    @DatabaseField(columnName = COLUMN_NAME_END, dataType = DataType.DATE_LONG)
+    public java.util.Date end;
     /** 場所名称 */
     @DatabaseField(columnName = COLUMN_NAME_LOCATION)
     public String location;
@@ -84,13 +88,13 @@ public class AttendingEvent {
     @DatabaseField(columnName = COLUMN_NAME_CREATEDAT, dataType = DataType.DATE_LONG)
     private java.util.Date createdAt;
 
-    protected Calendar mCalendar;
+    protected Calendar mCalendarFrom, mCalendarTo;
 
-    
+
     public AttendingEvent() {
         // no-arg constructor for deserializing
     }
-    
+
 
     @Override
     public boolean equals(Object other) {
@@ -103,8 +107,8 @@ public class AttendingEvent {
             return false;
         }
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         return super.hashCode();
@@ -118,6 +122,7 @@ public class AttendingEvent {
                 .add(COLUMN_NAME_OWNERS_ACCOUNT, ownersAccount)//
                 .add(COLUMN_NAME_TITLE, title)//
                 .add(COLUMN_NAME_BEGIN, begin)//
+                .add(COLUMN_NAME_END, end)//
                 .add(COLUMN_NAME_LOCATION, location)//
                 .add(COLUMN_NAME_ADDRESS, address)//
                 .add(COLUMN_NAME_DESCRIPTION, description)//
@@ -128,7 +133,7 @@ public class AttendingEvent {
                 .add(COLUMN_NAME_CREATEDAT, createdAt)//
                 .toString();
     }
-    
+
     /***********************************************
      * getter *
      ***********************************************/
@@ -139,15 +144,15 @@ public class AttendingEvent {
     public String getImageUrl() {
         return imageUrl;
     }
-    
+
     public String getDescription() {
         return description;
     }
-    
+
     public String getAddress() {
         return address;
     }
-    
+
     public String getEventId() {
         return eventId;
     }
@@ -158,7 +163,7 @@ public class AttendingEvent {
     public void setAttending(boolean attending) {
         this.attending  = attending;
     }
-    
+
     public String getDetailUrl() {
         return detailUrl;
     }
@@ -168,16 +173,25 @@ public class AttendingEvent {
     }
 
     public Calendar getDateFrom() {
-        if (mCalendar == null) {
-            mCalendar = CalendarUtils.getInstance(this.begin);
+        if (mCalendarFrom == null) {
+            mCalendarFrom = CalendarUtils.getInstance(this.begin);
         }
-        return mCalendar;
+        return mCalendarFrom;
+    }
+
+
+    public Calendar getDateTo() {
+        if (mCalendarTo == null) {
+            if (end == null)  end = begin;
+            mCalendarTo = CalendarUtils.getInstance(this.end);
+        }
+        return mCalendarTo;
     }
 
     /***********************************************
      * DB *
      ***********************************************/
-    
+
     public void save(Context context) {
         DatabaseHelper helper = DatabaseHelper.getHelper(context);
         try {
@@ -196,7 +210,7 @@ public class AttendingEvent {
             DatabaseHelper.releaseHelper();
         }
     }
-    
+
     public static AttendingEvent findEvent(Context context, String eventId, String ownersAccount) {
         DatabaseHelper helper = DatabaseHelper.getHelper(context);
         List<AttendingEvent> results;
@@ -216,7 +230,7 @@ public class AttendingEvent {
         if (results == null || results.isEmpty()) return null;
         return results.get(0);
     }
-    
+
     /**
      * 
      * @param context

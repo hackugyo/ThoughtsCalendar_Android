@@ -147,7 +147,10 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
 
         if (event != null) {
             holder.title.setText(event.getTitle());
-            holder.begin.setText(CalendarUtils.getDateStringWithoutYear(event.getDateFrom(), "/") + " 〜 ");
+            boolean isOneDay = (CalendarUtils.isSameDateAs(event.getDateFrom(), event.getDateTo()));
+            holder.begin.setText(CalendarUtils.getDateStringWithoutYear(event.getDateFrom(), "/") + //
+                    (isOneDay ? " 　 " : " 〜 ")//
+                    );
 
             holder.location.setText(event.getLocation());
 
@@ -251,6 +254,6 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
     }
     
     public String getGroupCustomFormat(Calendar calendar) {
-        return CalendarUtils.getDateStringWithoutYear(calendar, "/");
+        return CalendarUtils.getDateStringWithoutYear(calendar, "/") + " 開始";
     }
 }

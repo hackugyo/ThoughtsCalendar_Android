@@ -79,6 +79,7 @@ public class TokyoArtBeatFragmentHelper {
             parser.require(XmlPullParser.START_TAG, ns, "Event");
             String title = null;
             String dateFrom = null;
+            String dateTo = null;
             String imageUrl = null;
             String description = null;
             String address = null;
@@ -100,6 +101,8 @@ public class TokyoArtBeatFragmentHelper {
                     title = readTitle(parser);
                 } else if (name.equals("DateStart")) {
                     dateFrom = readDateFrom(parser);
+                }  else if (name.equals("DateEnd")) {
+                    dateTo = readDateTo(parser);
                 } else if (name.equals("Image")) {
                     imageUrl = readLink(parser);
                 } else if (name.equals("Description")) {
@@ -112,7 +115,7 @@ public class TokyoArtBeatFragmentHelper {
                     skip(parser);
                 }
             }
-            return new TokyoArtBeatEvent(eventId, title, dateFrom, imageUrl, description, address, location, url);
+            return new TokyoArtBeatEvent(eventId, title, dateFrom, dateTo, imageUrl, description, address, location, url);
         }
 
         // Processes title tags in the feed.
@@ -122,6 +125,10 @@ public class TokyoArtBeatFragmentHelper {
 
         private String readDateFrom(XmlPullParser parser) throws IOException, XmlPullParserException {
             return readText(parser, "DateStart");
+        }
+        
+        private String readDateTo(XmlPullParser parser) throws IOException, XmlPullParserException {
+            return readText(parser, "DateEnd");
         }
 
         // Processes link tags in the feed.

@@ -63,7 +63,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
         public View attendStatus;
         public View attendStatusExpand;
         ImageButton favoriteButton;
-        View showDetailButton;
+        ImageButton showDetailButton;
     }
 
     /****************************************
@@ -127,6 +127,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
         final String location = cursor.getString(cursor.getColumnIndexOrThrow(PlaceholderFragmentHelper.Place.KEY_EVENTLOCATION));
         final String description = cursor.getString(cursor.getColumnIndexOrThrow(PlaceholderFragmentHelper.Place.KEY_DESCRIPTION));
         final String eventId = cursor.getString(cursor.getColumnIndexOrThrow(PlaceholderFragmentHelper.Place.KEY_EVENTID));
+        final String detailUrl = cursor.getString(6);
 
         // 画面にセットします
         holder.title.setText(title);
@@ -145,7 +146,8 @@ public class PlaceholderListAdapter extends CursorAdapter {
                         willAttend ? R.color.attended_cell : android.R.color.transparent)//
                 );
         holder.favoriteButton.setImageResource(willAttend ? R.drawable.ic_favorite : R.drawable.ic_unfavorite);
-
+        holder.showDetailButton.setImageResource(StringUtils.isEmpty(detailUrl) ? R.drawable.ic_tag_empty : R.drawable.ic_tag);
+        holder.showDetailButton.setEnabled(StringUtils.isPresent(detailUrl));
         //holder.descrition.setText(description);
     }
 
@@ -166,7 +168,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
         holder.attendStatus = view.findViewById(R.id.list_row_placeholder_flag);
         holder.attendStatusExpand = view.findViewById(R.id.list_row_placeholder_flag_expandable);
         holder.favoriteButton = (ImageButton) view.findViewById(R.id.list_row_placeholder_expandable_button_b);
-        holder.showDetailButton = view.findViewById(R.id.list_row_placeholder_detail);
+        holder.showDetailButton = (ImageButton) view.findViewById(R.id.list_row_placeholder_expandable_button_c);
 
         view.setTag(holder);
 

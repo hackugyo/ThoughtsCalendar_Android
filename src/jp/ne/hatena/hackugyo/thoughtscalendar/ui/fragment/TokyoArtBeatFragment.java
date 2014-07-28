@@ -145,7 +145,9 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
                             showSingleToast("Twitterで参加表明しましょう！", Toast.LENGTH_SHORT);
                             TwitterUtils.sendText(getActivitySafely(),//
                                     StringUtils.build(//
-                                            title, "(", when, "開催)に行きます！ #", hashTag)//
+                                            title, "(", when, "〜開催)に興味あり！ ",//
+                                            StringUtils.valueOf(event.getDetailUrl()),//
+                                            " #", hashTag)//
                                     );
                         }
                         event.setAttending(!willAttendCurrently);
