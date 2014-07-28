@@ -2,6 +2,7 @@ package jp.ne.hatena.hackugyo.thoughtscalendar.ui.fragment;
 
 import java.util.Calendar;
 
+import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendStatus;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
@@ -59,6 +60,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
     private ActionSlideExpandableListAdapter mWrappedAdapter;
     private TextView mEmptyView;
     private String mAuthority;
+    private String mTitle;
 
     public PlaceholderFragment() {
     }
@@ -71,7 +73,9 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View onCreateView = inflater.inflate(R.layout.fragment_placeholder, container, false);
 
-        mAuthority = PlaceholderFragmentHelper.sCalendarOwners.get(getArguments().getInt(PlaceholderFragment.ARG_SECTION_NUMBER, 1) - 1);
+        int position = getArguments().getInt(PlaceholderFragment.ARG_SECTION_NUMBER, 1) - 1;
+        mAuthority = PlaceholderFragmentHelper.sCalendarOwners.get(position);
+        mTitle = position >= 2 ? "TokyoArtBeat" : CustomApplication.getStringArrayById(R.array.list_calendar_names).get(position);
         final int rowForDateTime = 2;
         mAdapter = new PlaceholderListAdapter(getActivitySafely(), null, false, //
                 R.layout.list_header_placeholder, rowForDateTime, mAuthority);
@@ -126,6 +130,20 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
      **********************************************/
     private void setupListView(View parentView) {
         mListView = (ListView) parentView.findViewById(android.R.id.list);
+        LayoutInflater inflater = LayoutInflater.from(parentView.getContext());
+        View footer = inflater.inflate(R.layout.list_footer_tokyoartbeat, null);
+        TextView footerTextView = (TextView)footer.findViewById(R.id.list_footer_placeholder_text);
+        footerTextView.setText("Powered by " + mTitle);
+        footer.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {               
+                String urlString = StringUtils.build("https://www.google.com/calendar/render?cid=",//
+                        mAuthority);
+                launchExternalBrowser(urlString);
+            }
+        });
+        // add footers before setting adapter!
+        mListView.addFooterView(footer);
         mListView.setAdapter(mWrappedAdapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -156,7 +174,6 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
             @SuppressLint("NewApi")
             @Override
             public void onClick(View v) {
-                
 
                 String urlString = StringUtils.build("https://www.google.com/calendar/render?cid=",//
                         mAuthority);
@@ -234,7 +251,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
 
         };
     }
-    
+
     private void launchMapByLocation(String location) {
         String alertMessage = StringUtils.build(//
                 "このイベントは、", //

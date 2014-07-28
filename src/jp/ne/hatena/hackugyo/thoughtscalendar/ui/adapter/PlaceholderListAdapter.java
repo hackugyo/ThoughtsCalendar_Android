@@ -208,7 +208,7 @@ public class PlaceholderListAdapter extends CursorAdapter {
     }
 
     /****************************************
-     * Header view
+     * view
      ****************************************/
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -402,5 +402,15 @@ public class PlaceholderListAdapter extends CursorAdapter {
             if (StringUtils.isSame(eventId, e.eventId) && e.attending) return true;
         }
         return false;
+    }
+    
+    /**
+     * Avoiding Android4.0.3 bug
+     */
+    @Override
+    public void unregisterDataSetObserver(DataSetObserver observer) {
+        if (observer != null) {
+            super.unregisterDataSetObserver(observer);
+        }
     }
 }
