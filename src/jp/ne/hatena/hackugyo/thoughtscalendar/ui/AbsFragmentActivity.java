@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -224,6 +225,14 @@ abstract public class AbsFragmentActivity extends ActionBarActivity {
         FragmentManager fm = getSupportFragmentManager();
         int backStackEntryCount = fm.getBackStackEntryCount();
         return (backStackEntryCount == 0);
+    }
+    
+    @Override
+    public void onBackPressed() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            if (getFragmentManager().popBackStackImmediate()) return;
+        }
+        super.onBackPressed();
     }
 
     /***********************************************
