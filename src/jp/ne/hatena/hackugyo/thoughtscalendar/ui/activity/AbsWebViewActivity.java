@@ -30,6 +30,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions.Callback;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
@@ -142,6 +143,15 @@ abstract public class AbsWebViewActivity extends AbsFragmentActivity implements 
         mWebView = (WebView) findViewById(R.id.webview);
         mWebView.setWebViewClient(mWebViewClient);
         mWebView.setWebChromeClient(mWebChromeClient);
+        mWebView.setDownloadListener(new DownloadListener() {
+            
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                Uri uri = Uri.parse(url);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+            }
+        });
         // mWebView.setBackgroundColor(0); // 背景を透明に
 
         WebSettings webSettings = mWebView.getSettings();

@@ -13,8 +13,8 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <application
-        android:allowBackup="true"
         android:name="jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication"
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -26,6 +26,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activity.WebViewActivity"
+            android:clearTaskOnLaunch="false"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
     </application>
 
