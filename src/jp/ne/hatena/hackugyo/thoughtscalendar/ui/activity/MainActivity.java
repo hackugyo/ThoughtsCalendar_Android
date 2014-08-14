@@ -1,5 +1,8 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.ui.activity;
 
+import java.util.Locale;
+
+import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.AbsFragmentActivity;
 import jp.ne.hatena.hackugyo.thoughtscalendar.ui.adapter.SectionsPagerAdapter;
@@ -8,6 +11,8 @@ import jp.ne.hatena.hackugyo.thoughtscalendar.ui.fragment.dialogfragment.AbsCust
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.StringUtils;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -37,6 +42,18 @@ public class MainActivity extends AbsFragmentActivity implements ActionBar.TabLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // http://stackoverflow.com/a/9173571/2338047
+        SharedPreferences sp = CustomApplication.getSharedPreferences();
+        boolean isForFrench = sp.getBoolean("LANG", false);
+        Locale locale = (isForFrench ? Locale.FRENCH : Locale.JAPAN);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config, 
+                getBaseContext().getResources().getDisplayMetrics());
+
+
         setContentView(R.layout.activity_main);
 
         // Set up the action bar.

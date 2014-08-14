@@ -238,6 +238,7 @@ public class AttendingEvent {
      * @return 指定したカレンダの参加予定イベントの配列（0件の場合は空） or null
      */
     public static List<AttendingEvent> findEvents(Context context, String ownersAccount) {
+        if (context == null) return null;
         DatabaseHelper helper = DatabaseHelper.getHelper(context);
         List<AttendingEvent> results = null;
         try {

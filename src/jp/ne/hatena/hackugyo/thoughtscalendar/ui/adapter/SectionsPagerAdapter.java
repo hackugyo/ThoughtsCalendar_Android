@@ -18,10 +18,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     // Show 2 total pages.
     private static final int CALENDARS_COUNT = 2;
-    static final ArrayList<String> sCalendarNames = CustomApplication.getStringArrayById(R.array.list_calendar_names);
+    ArrayList<String> mCalendarNames;
 
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
+        mCalendarNames = CustomApplication.getStringArrayById(R.array.list_calendar_names);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         if (position == 2) return TokyoArtBeatFragment.newInstance();
-        if (position < sCalendarNames.size()) return PlaceholderFragment.newInstance(position + 1);
+        if (position < mCalendarNames.size()) return PlaceholderFragment.newInstance(position + 1);
         return TokyoArtBeatFragment.newInstance();
     }
 
@@ -41,6 +42,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         if (position == 2) return "TokyoArtBeat";
-        return sCalendarNames.size() <= position ? null : sCalendarNames.get(position);
+        return mCalendarNames.size() <= position ? null : mCalendarNames.get(position);
     }
 }

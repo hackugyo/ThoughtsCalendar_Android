@@ -281,9 +281,7 @@ abstract public class AbsFragmentActivity extends ActionBarActivity {
     private void selectBrowser(String url, int requestId) {
         if (url == null) url = "";
         Intent mainIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        Intent chooserIntent = new Intent(Intent.ACTION_PICK_ACTIVITY);
-        chooserIntent.putExtra(Intent.EXTRA_INTENT, mainIntent); // ブラウザ選択
-        chooserIntent.putExtra(Intent.EXTRA_TITLE, "アプリケーションを選択");
+        Intent chooserIntent = Intent.createChooser(mainIntent, "アプリケーションを選択");
         try {
             startActivityForResult(chooserIntent, requestId);
         } catch (ActivityNotFoundException e) {

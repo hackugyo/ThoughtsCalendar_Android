@@ -36,4 +36,5 @@
     <string name="tokyoArtBeat_loading">読み込み中…\n\nPowered by Tokyo Art Beat</string>
     <string name="tokyoArtBeat_nothing">もうすぐ開始のイベントがありません。\n\nPowered by Tokyo Art Beat</string>
     
+    <string name="no_schedule">スケジュールがありません。ここをタップするとWebからインポートできます。\n(インポート後、端末のカレンダーアプリで同期してください。)</string>
 </resources>
