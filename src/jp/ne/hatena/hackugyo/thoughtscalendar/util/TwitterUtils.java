@@ -58,8 +58,8 @@ public class TwitterUtils {
     public static String createHashTag(String string) {
         return string//
                 .replaceAll("^[0-9]*", "")// 先頭に数字は使えない
-                .replaceAll("[!$%^&*+./\" 　:,、 , #：、。#「」『』]", "")//
-                .replace("'", "").replace("-", "");
+                .replaceAll("[!$%^&*+./\" 　:,、 , #：、。#「」『』〜]", "")//
+            .replace("'", "").replace("-", "").replace("?", "");
     }
 
     public static void searchByHashTag(Context context, String hashTag) {
