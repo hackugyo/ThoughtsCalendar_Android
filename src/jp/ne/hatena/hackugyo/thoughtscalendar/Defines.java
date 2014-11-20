@@ -23,10 +23,4 @@ public class Defines {
      * {@link AbsCustomAsyncTaskLoader}のID
      ***************************************************/
 
-    /****************************************************
-     * その他
-     ***************************************************/
-    /** ログ出力時のデフォルトタグ */
-    public static final String LOG_TAG = "ThoughtsCalendar";
-
 }

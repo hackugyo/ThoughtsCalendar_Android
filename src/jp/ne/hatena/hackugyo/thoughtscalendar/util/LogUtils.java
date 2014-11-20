@@ -1,6 +1,6 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.util;
 
-import jp.ne.hatena.hackugyo.thoughtscalendar.Defines;
+import jp.ne.hatena.hackugyo.thoughtscalendar.CustomApplication;
 import android.util.Log;
 
 /**
@@ -10,7 +10,7 @@ import android.util.Log;
  * @author User
  */
 public final class LogUtils {
-
+    
     /**
      * タグを指定してデバッグログを出力します.
      * 
@@ -32,12 +32,12 @@ public final class LogUtils {
      */
     public static void d(CharSequence msg) {
         if (!AppUtils.isDebuggable()) return;
-        Log.d(Defines.LOG_TAG, getLogForm(Thread.currentThread().getStackTrace()) + msg);
+        Log.d(getLogTag(), getLogForm(Thread.currentThread().getStackTrace()) + msg);
     }
 
     public static void i(CharSequence msg) {
         if (!AppUtils.isDebuggable()) return;
-        Log.i(Defines.LOG_TAG, getLogForm(Thread.currentThread().getStackTrace()) + msg);
+        Log.i(getLogTag(), getLogForm(Thread.currentThread().getStackTrace()) + msg);
     }
 
     public static void i(String tag, CharSequence msg) {
@@ -52,7 +52,7 @@ public final class LogUtils {
      *            エラーログ
      */
     public static void e(CharSequence msg) {
-        Log.e(Defines.LOG_TAG, getLogForm(Thread.currentThread().getStackTrace()) + msg);
+        Log.e(getLogTag(), getLogForm(Thread.currentThread().getStackTrace()) + msg);
     }
 
     /**
@@ -76,7 +76,7 @@ public final class LogUtils {
      *            例外
      */
     public static void e(CharSequence msg, Throwable e) {
-        Log.e(Defines.LOG_TAG, getLogForm(Thread.currentThread().getStackTrace()) + msg, e);
+        Log.e(getLogTag(), getLogForm(Thread.currentThread().getStackTrace()) + msg, e);
     }
 
     /**
@@ -114,7 +114,7 @@ public final class LogUtils {
      */
     public static void w(CharSequence msg) {
         if (!AppUtils.isDebuggable()) return;
-        Log.w(Defines.LOG_TAG, getLogForm(Thread.currentThread().getStackTrace()) + msg);
+        Log.w(getLogTag(), getLogForm(Thread.currentThread().getStackTrace()) + msg);
     }
 
     /**
@@ -138,7 +138,7 @@ public final class LogUtils {
      */
     public static void v(CharSequence msg) {
         if (!AppUtils.isDebuggable()) return;
-        Log.v(Defines.LOG_TAG, getLogForm(Thread.currentThread().getStackTrace()) + msg);
+        Log.v(getLogTag(), getLogForm(Thread.currentThread().getStackTrace()) + msg);
     }
 
     /**
@@ -163,19 +163,19 @@ public final class LogUtils {
         }
         switch (logLevel) {
             case Log.VERBOSE:
-                Log.v(Defines.LOG_TAG, message);
+                Log.v(getLogTag(), message);
                 break;
             case Log.DEBUG:
-                Log.d(Defines.LOG_TAG, message);
+                Log.d(getLogTag(), message);
                 break;
             case Log.INFO:
-                Log.i(Defines.LOG_TAG, message);
+                Log.i(getLogTag(), message);
                 break;
             case Log.WARN:
-                Log.w(Defines.LOG_TAG, message);
+                Log.w(getLogTag(), message);
                 break;
             case Log.ERROR:
-                Log.e(Defines.LOG_TAG, message);
+                Log.e(getLogTag(), message);
                 break;
             default:
                 break;
@@ -209,5 +209,9 @@ public final class LogUtils {
             // リリースビルドでは，elements[3]がnullになるようなので，ここで握りつぶしておく．
         }
         return sb.toString();
+    }
+    
+    private static String getLogTag() {
+        return CustomApplication.getAppContext().getPackageName();
     }
 }

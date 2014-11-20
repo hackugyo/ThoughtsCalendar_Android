@@ -90,13 +90,13 @@ abstract public class AbsWebViewActivity extends AbsFragmentActivity implements 
         super.onResume();
         // gifアニメが中にあった場合，停止させる
         // @see http://starzero.hatenablog.com/entry/20120716/1342421720
-        mWebView.resumeTimers();
+        if (mWebView != null) mWebView.resumeTimers();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mWebView.pauseTimers();
+        if (mWebView != null) mWebView.pauseTimers();
     }
 
     @Override
@@ -115,6 +115,10 @@ abstract public class AbsWebViewActivity extends AbsFragmentActivity implements 
         mWebView.stopLoading();
         mWebView.clearCache(true);
         unregisterForContextMenu(mWebView);
+        mWebView.setWebChromeClient(null);
+        mWebView.setWebViewClient(null);
+        // mWebView.clearCache(true);
+        mWebView.removeAllViews();
 
         // ここで，WebViewを即座に廃棄してしまうと，ZoomControlのfadingのバグが発生する．
         // http://stackoverflow.com/questions/5267639/how-to-safely-turn-webview-zooming-on-and-off-as-needed
@@ -125,6 +129,7 @@ abstract public class AbsWebViewActivity extends AbsFragmentActivity implements 
 
             @Override
             public void run() {
+                if (mWebView == null) return;
                 ViewGroup vg = (ViewGroup) mWebView.getParent();
                 if (vg != null) vg.removeView(mWebView);
                 mWebView.destroy();
