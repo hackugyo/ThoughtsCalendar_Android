@@ -42,6 +42,7 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
     TextView mEmptyView;
     private TokyoArtBeatAdapter mAdapter;
     private ActionSlideExpandableListAdapter mWrappedAdapter;
+    private ArrayList<AttendingEvent> mData;
 
     /**
      * Returns a new instance of this fragment for the given section number.
@@ -64,13 +65,22 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View onCreateView = inflater.inflate(R.layout.fragment_tokyoartbeat_list, container, false);
+
         mAdapter = new TokyoArtBeatAdapter(getActivitySafely(), new ArrayList<AttendingEvent>());
+
         mWrappedAdapter = new ActionSlideExpandableListAdapter(//
                 mAdapter,//
                 R.id.list_row_placeholder_cell, //
                 R.id.list_row_placeholder_expandable);
         setupListView(onCreateView);
-        getAPIAsync("http://www.tokyoartbeat.com/list/event_comingsoon.ja.xml", null);
+
+        if (mData == null || mData.isEmpty()) {
+            getAPIAsync("http://www.tokyoartbeat.com/list/event_comingsoon.ja.xml", null);
+        } else {
+            mAdapter.setItems(mData);
+            mAdapter.notifyDataSetChanged();
+            mWrappedAdapter.notifyDataSetChanged();
+        }
 
         return onCreateView;
     }
@@ -80,7 +90,6 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
      **********************************************/
     private void setupListView(View parentView) {
         mListView = (ListView) parentView.findViewById(android.R.id.list);
-        mListView.setAdapter(mWrappedAdapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -98,14 +107,16 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
         mListView.setEmptyView(mEmptyView);
 
         LayoutInflater inflater = LayoutInflater.from(parentView.getContext());
-        TextView footer = (TextView) inflater.inflate(R.layout.list_footer_tokyoartbeat, null);
+        View footer = inflater.inflate(R.layout.list_footer_tokyoartbeat, null);
         footer.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchExternalBrowser("http://www.tokyoartbeat.com");
             }
         });
+        // add footers before setting adapter!
         mListView.addFooterView(footer);
+        mListView.setAdapter(mWrappedAdapter);
 
         // Expandable Cellのボタンにリスナを配置
         mWrappedAdapter.setItemActionListener(getExpandActionListener(), //
@@ -145,7 +156,9 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
                             showSingleToast("Twitterで参加表明しましょう！", Toast.LENGTH_SHORT);
                             TwitterUtils.sendText(getActivitySafely(),//
                                     StringUtils.build(//
-                                            title, "(", when, "開催)に行きます！ #", hashTag)//
+                                            title, "(", when, "〜開催)に興味あり！ ",//
+                                            StringUtils.valueOf(event.getDetailUrl()),//
+                                            " #", hashTag)//
                                     );
                         }
                         event.setAttending(!willAttendCurrently);
@@ -173,8 +186,8 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
             }
         };
     }
-    
-    
+
+
     private void launchMapByLocation(String address, CharSequence location) {
         String alertMessage = StringUtils.build(//
                 "このイベントは、", //
@@ -233,9 +246,10 @@ public class TokyoArtBeatFragment extends AbsApiFragment<InputStream> {
             }
             data = new ArrayList<AttendingEvent>(ArrayUtils.concatList(findEvents, data));
         }
-        
+
         Collections.sort(data, TokyoArtBeatEvent.ascending());
-        
+
+        mData = data;
         mAdapter.setItems(data);
         mAdapter.notifyDataSetChanged();
         if (data == null || data.isEmpty()) {

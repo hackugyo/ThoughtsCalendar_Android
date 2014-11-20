@@ -10,6 +10,7 @@ import jp.ne.hatena.hackugyo.thoughtscalendar.R;
 import jp.ne.hatena.hackugyo.thoughtscalendar.model.AttendingEvent;
 import jp.ne.hatena.hackugyo.thoughtscalendar.util.CalendarUtils;
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,7 +148,10 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
 
         if (event != null) {
             holder.title.setText(event.getTitle());
-            holder.begin.setText(CalendarUtils.getDateStringWithoutYear(event.getDateFrom(), "/") + " 〜 ");
+            boolean isOneDay = (CalendarUtils.isSameDateAs(event.getDateFrom(), event.getDateTo()));
+            holder.begin.setText(CalendarUtils.getDateStringWithoutYear(event.getDateFrom(), "/") + //
+                    (isOneDay ? " 　 " : " 〜 ")//
+                    );
 
             holder.location.setText(event.getLocation());
 
@@ -251,6 +255,16 @@ public class TokyoArtBeatAdapter extends BaseAdapter {
     }
     
     public String getGroupCustomFormat(Calendar calendar) {
-        return CalendarUtils.getDateStringWithoutYear(calendar, "/");
+        return CalendarUtils.getDateStringWithoutYear(calendar, "/") + " 開始";
+    }
+    
+    /**
+     * Avoiding Android4.0.3 bug
+     */
+    @Override
+    public void unregisterDataSetObserver(DataSetObserver observer) {
+        if (observer != null) {
+            super.unregisterDataSetObserver(observer);
+        }
     }
 }

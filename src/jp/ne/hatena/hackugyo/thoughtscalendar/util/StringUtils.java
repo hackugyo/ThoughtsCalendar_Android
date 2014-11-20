@@ -237,7 +237,7 @@ public final class StringUtils {
     }
 
     /**
-     * 与えられた文字列を，半角max文字以下に切り詰めます。切り捨て部分がある場合，"..."を末尾に追加します。
+     * 与えられた文字列を，半角max文字以下に切り詰めます。切り捨て部分がある場合，"…"を末尾に追加します。
      * 
      * @param input
      * @param max
@@ -249,7 +249,7 @@ public final class StringUtils {
             return (padLeft ? padLeft(input, max) : input);
         }
         int charactersAfterEllipsis = 0;
-        return input.substring(0, max - 3 - charactersAfterEllipsis) + "..." + input.substring(input.length() - charactersAfterEllipsis);
+        return input.substring(0, max - 1 - charactersAfterEllipsis) + "…" + input.substring(input.length() - charactersAfterEllipsis);
     }
 
     public static String ellipsizeMiddle(String input, int max, boolean padLeft) {
@@ -257,8 +257,8 @@ public final class StringUtils {
             return (padLeft ? padLeft(input, max) : input);
         }
         int charactersAfterEllipsis = max / 2;
-        int charactersBeforeEllipsis = max - 3 - charactersAfterEllipsis;
-        return input.substring(0, charactersBeforeEllipsis) + "..." + input.substring(input.length() - charactersAfterEllipsis);
+        int charactersBeforeEllipsis = max - 1 - charactersAfterEllipsis;
+        return input.substring(0, charactersBeforeEllipsis) + "…" + input.substring(input.length() - charactersAfterEllipsis);
     }
 
     public static String getCRLF() {
@@ -413,4 +413,20 @@ public final class StringUtils {
         }
         return true;
     }
+    
+    /**
+     * 指定された正規表現に一致する場合、対象文字列で置換します。
+     *
+     * @param value 処理対象となる文字列
+     * @param regex 正規表現
+     * @param replacement 置換文字列
+     * @return 置換後の配列
+     */
+    public static String replaceAllRegex(String value, String regex, String replacement) {
+        if ( value == null || value.length() == 0 || regex == null || regex.length() == 0 || replacement == null ) {
+            return "";
+        }
+        return Pattern.compile(regex).matcher(value).replaceAll(replacement);
+    }
+
 }
