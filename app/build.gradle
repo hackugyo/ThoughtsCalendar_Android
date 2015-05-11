@@ -69,6 +69,7 @@ dependencies {
   compile 'com.j256.ormlite:ormlite-android:4.48'
   compile 'com.mcxiaoke.volley:library:1.0.+'
   compile group: 'com.google.guava', name: 'guava', version: '12.0'
+  compile project(':AndroidBootstrap:AndroidBootstrap')
   // SnappyDB
   compile 'com.snappydb:snappydb-lib:0.5.0'
   compile 'com.esotericsoftware.kryo:kryo:2.24.0'

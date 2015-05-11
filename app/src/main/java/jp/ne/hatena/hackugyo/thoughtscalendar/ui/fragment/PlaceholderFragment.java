@@ -58,7 +58,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
     ListView mListView;
     private PlaceholderListAdapter mAdapter;
     private ActionSlideExpandableListAdapter mWrappedAdapter;
-    private TextView mEmptyView;
+    private View mEmptyView;
     private String mAuthority;
     private String mTitle;
 
@@ -152,7 +152,7 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
                 // ignored.
             }
         });
-        mEmptyView = (TextView) parentView.findViewById(android.R.id.empty);
+        mEmptyView = parentView.findViewById(android.R.id.empty);
         mListView.setEmptyView(mEmptyView);
         // Expandable Cellのボタンにリスナを配置
         mWrappedAdapter.setItemActionListener(getExpandActionListener(), //
@@ -167,9 +167,9 @@ public class PlaceholderFragment extends AbsFragment implements LoaderManager.Lo
 
     private void setupEmptyView(View parentView) {
         if (mEmptyView == null) {
-            mEmptyView = (TextView) parentView.findViewById(android.R.id.empty);
+            mEmptyView = parentView.findViewById(android.R.id.empty);
         }
-        mEmptyView.setOnClickListener(new OnClickListener() {
+        mEmptyView.findViewById(R.id.placeholder_import_schedules).setOnClickListener(new OnClickListener() {
 
             @SuppressLint("NewApi")
             @Override

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android-bootstrap="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -13,14 +15,24 @@
         android:drawSelectorOnTop="false" />
     <!-- アイテムが空の場合に使用するテキスト（idは定義済みのandroid:empty） -->
 
-    <TextView
+    <LinearLayout
         android:id="@id/android:empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="left|center_vertical"
+        android:gravity="center"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:text="@string/no_schedule"
-        android:textSize="16sp" />
+        android:orientation="horizontal"
+        >
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:id="@+id/placeholder_import_schedules"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_schedule"
+            android:textSize="16sp"
+            app:bb_icon_left="fa-plus-circle"
+            app:bb_type="default"
+            />
+    </LinearLayout>
 
 </LinearLayout>
