@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jp.ne.hatena.hackugyo.thoughtscalendar"
-    android:versionCode="2"
-    android:versionName="1.1" >
-
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="19" />
+    package="jp.ne.hatena.hackugyo.thoughtscalendar" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -37,5 +31,11 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
     </application>
+
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="18" /> <!-- JELLY_BEAN_MR2 -->
+
 
 </manifest>
