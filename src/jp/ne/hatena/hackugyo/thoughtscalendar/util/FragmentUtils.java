@@ -1,9 +1,11 @@
 package jp.ne.hatena.hackugyo.thoughtscalendar.util;
 
+import java.util.List;
+
 import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
 
 public class FragmentUtils {
     /**
@@ -54,6 +56,25 @@ public class FragmentUtils {
     public static boolean isSameRequestCode(int requestCode, int targetCode) {
         int requestCodeFromFragment = requestCode & 0xffff;
         return (requestCode == targetCode || requestCodeFromFragment == targetCode);
+    }
+
+    /**
+     * 現フラグメントを取得します
+     *
+     * @param fragmentManager
+     * @return 現在出ているフラグメント or null
+     */
+    public static Fragment getCurrentFragmentFrom(FragmentManager fragmentManager) {
+        if (fragmentManager != null) {
+            List<Fragment> fragments = fragmentManager.getFragments();
+            for (int i = fragments.size() - 1; i >= 0; i--) {
+                Fragment fragment = fragments.get(i);
+                if (fragment != null) {
+                    return fragment;
+                }
+            }
+        }
+        return null;
     }
 
 }

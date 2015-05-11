@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
-
 public class ArrayUtils {
+    
+    private ArrayUtils() {
+
+    }
+
 
     /**
      * ArrayListインスタンスそのものは変更せず，中身だけをinitialArrayで完全に上書きします．
@@ -171,6 +174,27 @@ public class ArrayUtils {
     public static <T>  ArrayList<T> asList(List<? extends T> list) {
         if (list == null) return null;
         return new ArrayList<T>(list);
+    }
+
+    public static boolean any(List<?> list) {
+        return list != null && !list.isEmpty();
+    }
+
+    public static <T> void replaceAll(List<T> target,  List<T> list) {
+        if (list == null) throw new NullPointerException();
+        if (target == null) target = new ArrayList<T>();
+        if (target == list) return;
+        target.clear();
+        for (T obj : list) {
+            target.add(obj);
+        }
+        return;
+    }
+
+    public static <T> List<T> copy(List<T> original) {
+        List<T> result = new ArrayList<T>();
+        if (original != null) result.addAll(original);
+        return result;
     }
 
 }

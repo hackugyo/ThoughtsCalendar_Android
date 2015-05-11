@@ -225,9 +225,27 @@ public final class StringUtils {
         }
         return sb.toString();
     }
+    
+    /**
+     * 可変長引数の文字列配列を、nullや空文字は無視して，separatorで結合して返します．
+     * @param separator
+     * @param texts
+     * @return 結合語の文字列
+     */
+    public static String joinStringWithoutBlank(String separator, String... texts) {
+        if (texts == null ||  texts.length == 0) return "";
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String t : texts) {
+            if (t == null || t.length() == 0) continue;
+            if (stringBuilder.length() > 0) stringBuilder.append(separator);
+            stringBuilder.append(t);
+        }
+        return stringBuilder.toString();
+    }
+
 
     /**
-     * 与えられた文字列を，半角max文字以下に切り詰めます。切り捨て部分がある場合，"..."を末尾に追加します。
+     * 与えられた文字列を，半角max文字以下に切り詰めます。切り捨て部分がある場合，"…"を末尾に追加します。
      * 
      * @param detail
      * @param max
